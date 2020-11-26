@@ -1,0 +1,5 @@
+mode: chatops
+autoCloseIssue: true
+branches:
+  - label: '*'
+    name: develop
