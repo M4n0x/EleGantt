@@ -22,7 +22,7 @@ namespace EleGantt.core.models
             set
             {
                 Date = value;
-                OnPropertyChanged("date");
+                OnPropertyChanged("Date");
             }
             get
             {

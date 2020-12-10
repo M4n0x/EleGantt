@@ -40,6 +40,14 @@ namespace EleGantt.core.models
             OnPropertyChanged("Milestones");
         }
 
+        public void RemoveMilestone(Milestone milestone)
+        {
+            if (Milestones.Remove(milestone))
+            {
+                OnPropertyChanged("Milestones");
+            }
+        }
+
 
         #region INotifyPropertyChanged Members  
 
