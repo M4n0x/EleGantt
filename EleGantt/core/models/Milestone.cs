@@ -5,28 +5,30 @@ namespace EleGantt.core.models
 {
     internal class Milestone : INotifyPropertyChanged
     {
+        private string _name;
+        private DateTime _date;
         private string Name 
         {
             set
             {
-                Name = value;
+                _name = value;
                 OnPropertyChanged("Name");
             }
             get
             {
-                return Name;
+                return _name;
             }
         }
         private DateTime Date
         {
             set
             {
-                Date = value;
+                _date = value;
                 OnPropertyChanged("Date");
             }
             get
             {
-                return Date;
+                return _date;
             }
         }
 

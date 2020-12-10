@@ -22,6 +22,24 @@
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
+            <TextBlock  Grid.Row="0" TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Projet Name'}" VerticalAlignment="Top" Padding="10px" FontWeight="Bold"/>
+            <ListView Margin="10" ItemsSource="{Binding Tasks}" Grid.Row="1">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <WrapPanel>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                        </WrapPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <GridSplitter Grid.Column="1"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Stretch"
+              Background="LightGray" 
+              ShowsPreview="True"
+              Width="1"
+              Grid.RowSpan="2"
+              />
         </Grid>
 
         <Grid Grid.Column="0">

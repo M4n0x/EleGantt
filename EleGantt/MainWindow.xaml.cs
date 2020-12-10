@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EleGantt.core.viewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,16 @@ namespace EleGantt
     {
         public MainWindow()
         {
+            var viewModel = new GanttViewModel();
+
+            //@Todo replace by data manager
+            viewModel.Name = "test";
+
+
+            DataContext = viewModel;
             InitializeComponent();
+
+            viewModel.Name = "oopsie";
         }
     }
 }
