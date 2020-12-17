@@ -6,46 +6,55 @@ namespace EleGantt.core.models
 {
     internal class GanttTask : INotifyPropertyChanged
     {
-        private string Name 
+        private string _name;
+        private DateTime _dateStart;
+        private DateTime _dateEnd;
+        private IList<GanttTask> _subTasks;
+        public string Name 
         { 
             set 
             { 
-                Name = value;
+                _name = value;
                 OnPropertyChanged("Name");
             }
-            get { return Name; }
+            get { return _name; }
         }
-        private DateTime DateStart 
+        public DateTime DateStart 
         {
             set
             {
-                DateStart = value;
+                _dateStart = value;
                 OnPropertyChanged("DateStart");
             }
-            get { return DateStart; }
+            get { return _dateStart; }
         }
-        private DateTime DateEnd
+        public DateTime DateEnd
         {
             set
             {
-                DateEnd = value;
+                _dateEnd = value;
                 OnPropertyChanged("DateEnd");
             }
-            get { return DateStart; }
+            get { return _dateEnd; }
         }
-        private List<GanttTask> Subtasks;
+
+        public IList<GanttTask> SubTasks
+        {
+            get { return _subTasks; }
+            set { _subTasks = value; }
+        }
 
         public void AddSubTask(GanttTask task)
         {
-            Subtasks.Add(task);
-            OnPropertyChanged("tasks");
+            _subTasks.Add(task);
+            OnPropertyChanged("SubTasks");
         }
 
         public void RemoveSubTask(GanttTask task)
         {
-            if (Subtasks.Remove(task))
+            if (_subTasks.Remove(task))
             {
-                OnPropertyChanged("tasks");
+                OnPropertyChanged("SubTasks");
             }
         }
 

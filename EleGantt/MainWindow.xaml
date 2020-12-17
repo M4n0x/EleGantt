@@ -5,11 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EleGantt"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20px"/>
+            <RowDefinition Height="45px"/>
             <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
 
@@ -22,6 +30,24 @@
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
+            <TextBlock  Grid.Row="0" TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Projet Name'}" VerticalAlignment="Top" Padding="10px" FontWeight="Bold"/>
+            <ListView Margin="10" ItemsSource="{Binding Tasks}" Grid.Row="1">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <WrapPanel>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                        </WrapPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <GridSplitter Grid.Column="1"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Stretch"
+              Background="LightGray" 
+              ShowsPreview="True"
+              Width="1"
+              Grid.RowSpan="2"
+              />
         </Grid>
 
         <Grid Grid.Column="0">
