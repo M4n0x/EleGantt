@@ -40,6 +40,23 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+            <Grid x:Name="taskGrid" Row="0" RowSpan="2" Column="1" 
+                            ShowGridLines="True"
+                            local:GridHelpers.RowCount="{Binding RowCount}"
+                            local:GridHelpers.ColumnCount="{Binding ColumnCount}">
+                <!-- Grid definiton, rows and columns-->
+                <Grid.RowDefinitions ItemsSource="{Binding Tasks}">
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="1" Grid.Column="1">
+                Test
+                </TextBlock>
+            </Grid>
+            
             <GridSplitter Grid.Column="1"
               HorizontalAlignment="Left"
               VerticalAlignment="Stretch"

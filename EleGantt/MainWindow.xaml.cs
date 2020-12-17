@@ -11,11 +11,11 @@ namespace EleGantt
     {
         public MainWindow()
         {
-            var viewModel = new GanttViewModel();
-
-            //@Todo replace by data manager
-            viewModel.Name = "test";
-
+            var viewModel = new GanttViewModel
+            {
+                //@Todo replace by data manager
+                Name = "test"
+            };
 
             DataContext = viewModel;
             InitializeComponent();
