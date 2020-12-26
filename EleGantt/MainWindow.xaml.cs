@@ -1,6 +1,6 @@
 ﻿using EleGantt.core.viewModels;
+using System;
 using System.Windows;
-
 
 namespace EleGantt
 {
@@ -9,18 +9,25 @@ namespace EleGantt
     /// </summary>
     public partial class MainWindow : Window
     {
+        private GanttViewModel viewModel;
         public MainWindow()
         {
-            var viewModel = new GanttViewModel();
+            viewModel = new GanttViewModel();
 
             //@Todo replace by data manager
             viewModel.Name = "test";
-
+            viewModel.ClosingRequest += delegate { Close(); };
 
             DataContext = viewModel;
             InitializeComponent();
 
             viewModel.Name = "oopsie";
         }
+
+        public void OnListDoubleClick(object sender, EventArgs e)
+        {
+            //TODO
+        }
+
     }
 }

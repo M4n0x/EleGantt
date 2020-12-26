@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:local="clr-namespace:EleGantt"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
@@ -13,7 +14,28 @@
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}">
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        MinHeight="300px"
+        MinWidth="500px">
+
+    <!--<Window.Resources>
+
+        <Style TargetType="{x:Type TextBox}">
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="False">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type TextBox}">
+                                <TextBlock Text="{TemplateBinding Text}" />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+
+        </Style>
+
+    </Window.Resources>-->
 
     <Grid>
         <Grid.RowDefinitions>
@@ -23,31 +45,64 @@
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="16*"/>
-                <RowDefinition Height="85*"/>
+                <RowDefinition Height="20*" MinHeight="40px"/>
+                <RowDefinition Height="85*" MinHeight="100px"/>
+                <RowDefinition Height="20*" MinHeight="60px"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*" MinWidth="200px"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="LightGray" />
             <TextBlock  Grid.Row="0" TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Projet Name'}" VerticalAlignment="Top" Padding="10px" FontWeight="Bold"/>
-            <ListView Margin="10" ItemsSource="{Binding Tasks}" Grid.Row="1">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <WrapPanel>
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                        </WrapPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <!--<ContentControl MouseDoubleClick="OnListDoubleClick" >-->
+                <ListView x:Name="sideListView" Margin="10,10,10,10" Grid.Row="1" ItemsSource="{Binding Tasks}"  
+                          dd:DragDrop.IsDragSource="True" 
+                          dd:DragDrop.IsDropTarget="True" 
+                          SelectedItem="{Binding SelectedTask}" 
+                          HorizontalContentAlignment="Stretch" 
+                          VerticalContentAlignment="Stretch">
+                    <ListView.ItemTemplate >
+                        <DataTemplate>
+                            <WrapPanel>
+                                <TextBlock x:Name="labelTask" Text="{Binding Name}" Visibility="{Binding showTextBlock}" FontWeight="Bold" HorizontalAlignment="Left" >
+                                    <TextBlock.InputBindings>
+                                        <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding EnableEditionCmd}"/>
+                                    </TextBlock.InputBindings>
+                                </TextBlock>
+                                <TextBox x:Name="inputTask" Text="{Binding Name}" Visibility="{Binding showTextBox}" FontWeight="Bold" HorizontalAlignment="Left"/>
+                            </WrapPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.InputBindings>
+                        <KeyBinding Key="Delete" 
+                                    CommandParameter="{Binding ElementName=sideListView, Path=SelectedItems}"
+                                    Command="{Binding RemoveSelectedTasksCmd}" />
+                        <KeyBinding Key="F2" Command="{Binding EnableEditionCmd}"/>
+                        <KeyBinding Key="Enter" Command="{Binding DisableEditionCmd}"/>
+                        <KeyBinding Key="Esc" Command="{Binding DisableEditionCmd}"/>
+                </ListView.InputBindings>
+                </ListView>
+            <!--</ContentControl>-->
             <GridSplitter Grid.Column="1"
               HorizontalAlignment="Left"
               VerticalAlignment="Stretch"
               Background="LightGray" 
               ShowsPreview="True"
               Width="1"
-              Grid.RowSpan="2"
+              Grid.RowSpan="3"
               />
+
+            <Button x:Name="btnDelete" HorizontalAlignment="Left" Margin="10,10,0,10" Grid.Row="2" Width="75" 
+                    Style="{StaticResource MaterialDesignOutlinedButton}" 
+                    CommandParameter="{Binding ElementName=sideListView, Path=SelectedItems}"
+                    Command="{Binding RemoveSelectedTasksCmd}">
+                <materialDesign:PackIcon Kind="Delete" Width="15" Height="15"/>
+            </Button>
+            <Button x:Name="btnAdd" Margin="10,10,10,10" Grid.Row="2" Width="75" HorizontalAlignment="Right" Command="{Binding AddTaskCmd}">
+                <materialDesign:PackIcon Kind="Add" Width="15" Height="15"  />
+            </Button>
+            
         </Grid>
 
         <Grid Grid.Column="0">
@@ -55,10 +110,11 @@
                 <Menu DockPanel.Dock="Top">
                     <MenuItem Header="_File" FontSize="15" Height="30">
                         <MenuItem Header="_New" />
+                        <MenuItem Header="_New Task" Command="{Binding AddTaskCmd}" />
                         <MenuItem Header="_Open" />
                         <MenuItem Header="_Save" />
                         <Separator />
-                        <MenuItem Header="_Exit" />
+                        <MenuItem Header="_Exit" Command="{Binding CloseCmd}"/>
                     </MenuItem>
                 </Menu>
                 <TextBox AcceptsReturn="True" />
