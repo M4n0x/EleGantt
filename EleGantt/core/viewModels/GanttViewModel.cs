@@ -47,7 +47,6 @@ namespace EleGantt.core.viewModels
                 _selectedTask = value;
                 OnPropertyChanged("SelectedTask");
             }
-            
         }
 
         public ObservableCollection<GanttTaskViewModel> Tasks

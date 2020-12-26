@@ -26,7 +26,7 @@ namespace EleGantt
 
         public void OnListDoubleClick(object sender, EventArgs e)
         {
-            //TODO
+            viewModel.EnableEditionCmd.Execute(null);
         }
 
     }
