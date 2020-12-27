@@ -20,7 +20,7 @@ namespace EleGantt.core.models
                 new MilestoneModel{Name="test",  Date=DateTime.Now},
                 new MilestoneModel{Name="Test 123",  Date=DateTime.Now.AddDays(3)},
             };
-
+        public GanttModel() { }
         public GanttModel(string Name) : this(Name, Guid.NewGuid().ToString()) { }
 
         public GanttModel(string Name, string UUID)

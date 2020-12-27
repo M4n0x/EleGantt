@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using EleGantt.core.utils;
+using Newtonsoft.Json;
 
 namespace EleGantt.core.viewModels
 {
@@ -127,7 +128,7 @@ namespace EleGantt.core.viewModels
         public void DoSerialization()
         {
             //@TODO
-            //Use project's UUID to preserve consistency between projects
+            Trace.WriteLine(JsonConvert.SerializeObject(_project));
         }
 
         protected void OnClosingRequest()
@@ -205,6 +206,8 @@ namespace EleGantt.core.viewModels
                 return _saveProjectCmd ?? (_saveProjectCmd = new RelayCommand(x =>
                 {
                     Trace.WriteLine("Save project... TODO");
+                    Trace.WriteLine(JsonConvert.SerializeObject(_project));
+                    LoadGanttModel(JsonConvert.DeserializeObject<GanttModel>(JsonConvert.SerializeObject(_project)));
                 }));
             }
         }

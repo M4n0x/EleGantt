@@ -105,9 +105,9 @@
             <DockPanel>
                 <Menu DockPanel.Dock="Top">
                     <MenuItem Header="_File" FontSize="15" Height="30">
-                        <MenuItem Header="_New Project" Command="{Binding CreateNewProjectCmd}" />
-                        <MenuItem Header="_Open Project" Command="{Binding OpenProjectCmd}"/>
-                        <MenuItem Header="_Save Project" Command="{Binding SaveProjectCmd}"/>
+                        <MenuItem Header="_New" Command="{Binding CreateNewProjectCmd}" />
+                        <MenuItem Header="_Open" Command="{Binding OpenProjectCmd}"/>
+                        <MenuItem Header="_Save" Command="{Binding SaveProjectCmd}"/>
                         <Separator />
                         <MenuItem Header="_Exit" Command="{Binding CloseCmd}"/>
                     </MenuItem>
