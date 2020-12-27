@@ -36,7 +36,7 @@ namespace EleGantt.core.utils
             AddItems(_source);
 
             // Subscribe to the source's CollectionChanged event
-            _source.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(_source_CollectionChanged);
+            _source.CollectionChanged += new NotifyCollectionChangedEventHandler(_source_CollectionChanged);
         }
 
         private void AddItems(IEnumerable<TSource> items)
@@ -47,7 +47,7 @@ namespace EleGantt.core.utils
             }
         }
 
-        void _source_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        void _source_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -61,7 +61,7 @@ namespace EleGantt.core.utils
                     foreach (var sourceItem in e.OldItems.Cast<TSource>())
                     {
                         var toRemove = this.First(item => _isSameSource(item, sourceItem));
-                        this.Remove(toRemove);
+                        Remove(toRemove);
                     }
                     break;
                 case NotifyCollectionChangedAction.Replace:
@@ -71,8 +71,8 @@ namespace EleGantt.core.utils
                     }
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    this.Clear();
-                    this.AddItems(_source);
+                    Clear();
+                    AddItems(_source);
                     break;
                 default:
                     break;

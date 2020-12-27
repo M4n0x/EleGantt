@@ -1,30 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
+using System.Windows.Input;
 using EleGantt.core.models;
 
 namespace EleGantt.core.viewModels
 {
     internal class GanttTaskViewModel : INotifyPropertyChanged
     {
-        private GanttTask _task;
+        private GanttTaskModel _task;
         private bool _isSelected;
         private bool _isEdition;
 
-        public GanttTaskViewModel(GanttTask task)
+        public GanttTaskViewModel(GanttTaskModel task)
         {
             this._task = task;
         }
 
 
-        public Visibility showTextBlock
+        public Visibility ShowTextBlock
         {
             get { return _isEdition ? Visibility.Collapsed : Visibility.Visible; }
         }
-        public Visibility showTextBox
+        public Visibility ShowTextBox
         {
             get { return _isEdition ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        public GanttTaskModel GanttTaskModel
+        {
+            get
+            {
+                return _task;
+            }
         }
 
         public bool IsSelected
@@ -42,8 +52,8 @@ namespace EleGantt.core.viewModels
             {
                 _isEdition = value;
                 OnPropertyChanged("IsEdition");
-                OnPropertyChanged("showTextBlock");
-                OnPropertyChanged("showTextBox");
+                OnPropertyChanged("ShowTextBlock");
+                OnPropertyChanged("ShowTextBox");
             }
             get { return _isEdition; }
         }
@@ -75,26 +85,6 @@ namespace EleGantt.core.viewModels
             get { return _task.DateEnd; }
         }
 
-        public IList<GanttTask> SubTasks
-        {
-            get { return _task.SubTasks; }
-            set { _task.SubTasks = value; }
-        }
-
-        public void AddSubTask(GanttTask task)
-        {
-            _task.SubTasks.Add(task);
-            OnPropertyChanged("SubTasks");
-        }
-
-        public void RemoveSubTask(GanttTask task)
-        {
-            if (_task.SubTasks.Remove(task))
-            {
-                OnPropertyChanged("SubTasks");
-            }
-        }
-
         #region INotifyPropertyChanged Members  
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -106,6 +96,39 @@ namespace EleGantt.core.viewModels
             }
         }
 
+        #endregion
+
+
+        #region COMMANDS 
+
+        private RelayCommand _enableEditionCmd;
+        public ICommand EnableEditionCmd
+        {
+            get
+            {
+                return _enableEditionCmd ?? (_enableEditionCmd = new RelayCommand(x =>
+                {
+                    Trace.WriteLine("Enable edit");
+                    if (!IsEdition)
+                        IsEdition = true;
+                }));
+            }
+        }
+
+        private RelayCommand _disableEditionCmd;
+
+        public ICommand DisableEditionCmd
+        {
+            get
+            {
+                return _disableEditionCmd ?? (_disableEditionCmd = new RelayCommand(x =>
+                {
+                    Trace.WriteLine("Disable edit");
+                    if (IsEdition)
+                        IsEdition = false;
+                }));
+            }
+        }
         #endregion
     }
 }

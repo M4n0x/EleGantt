@@ -6,11 +6,16 @@ namespace EleGantt.core.viewModels
 {
     internal class MilestoneViewModel : INotifyPropertyChanged
     {
-        private Milestone _milestone;
+        private MilestoneModel _milestone;
 
-        public MilestoneViewModel(Milestone milestone)
+        public MilestoneViewModel(MilestoneModel milestone)
         {
             _milestone = milestone;
+        }
+
+        public MilestoneModel MilestoneModel
+        {
+            get { return _milestone; }
         }
 
         public string Name 
