@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:converters="clr-namespace:EleGantt.core.utils.converters"
         xmlns:local="clr-namespace:EleGantt"
         mc:Ignorable="d"
         Title="{Binding Name}" Height="450" Width="800"
@@ -19,7 +20,12 @@
         MinHeight="300px"
         MinWidth="500px">
 
+    <Window.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
+    </Window.Resources>
+
     <Grid>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="30px"/>
             <RowDefinition Height="5*"/>
@@ -46,7 +52,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <WrapPanel>
-                            <TextBox x:Name="inputTask" Text="{Binding Name}" IsVisibleChanged="inputTask_IsVisibleChanged" Visibility="{Binding ShowTextBox}" FontWeight="Bold" HorizontalAlignment="Stretch">
+                            <TextBox x:Name="inputTask" Text="{Binding Name}" IsVisibleChanged="inputTask_IsVisibleChanged" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}}" FontWeight="Bold" HorizontalAlignment="Stretch">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="LostFocus">
                                         <i:InvokeCommandAction Command="{Binding DisableEditionCmd}" />
@@ -57,7 +63,7 @@
                                     <KeyBinding Key="Enter" Command="{Binding DisableEditionCmd}"/>
                                 </TextBox.InputBindings>
                             </TextBox>
-                            <TextBlock x:Name="labelTask" Text="{Binding Name}" Visibility="{Binding ShowTextBlock}" FontWeight="Bold" HorizontalAlignment="Stretch" >
+                            <TextBlock x:Name="labelTask" Text="{Binding Name}" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}, ConverterParameter=1}" FontWeight="Bold" HorizontalAlignment="Stretch" >
                                 <TextBlock.InputBindings>
                                     <KeyBinding Key="F2"
                                                 Command="{Binding EnableEditionCmd}"/>
@@ -65,7 +71,6 @@
                                                   Command="{Binding EnableEditionCmd}"/>
                                 </TextBlock.InputBindings>
                             </TextBlock>
-                            
                         </WrapPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -100,10 +105,9 @@
             <DockPanel>
                 <Menu DockPanel.Dock="Top">
                     <MenuItem Header="_File" FontSize="15" Height="30">
-                        <MenuItem Header="_New" Command="{Binding CreateNewProjectCmd}" />
-                        <MenuItem Header="_New Task" Command="{Binding AddTaskCmd}" />
-                        <MenuItem Header="_Open" />
-                        <MenuItem Header="_Save" />
+                        <MenuItem Header="_New Project" Command="{Binding CreateNewProjectCmd}" />
+                        <MenuItem Header="_Open Project" Command="{Binding OpenProjectCmd}"/>
+                        <MenuItem Header="_Save Project" Command="{Binding SaveProjectCmd}"/>
                         <Separator />
                         <MenuItem Header="_Exit" Command="{Binding CloseCmd}"/>
                     </MenuItem>

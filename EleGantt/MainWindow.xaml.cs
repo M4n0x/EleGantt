@@ -24,20 +24,12 @@ namespace EleGantt
             InitializeComponent();
         }
 
-
-        //This is a workaround see : 
-        public void OnListDoubleClick(object sender, EventArgs e)
-        {
-            //viewModel.EnableEditionCmd.Execute(null);
-        }
-
         private void inputTask_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            Trace.WriteLine("changed");
             var input = sender as TextBox;
             if (input.Visibility == Visibility.Visible)
             {
-                Action focusAction = () => input.Focus();
+                Action focusAction = () => input.Focus(); //delay focus action cause mainwindows can be busy
                 this.Dispatcher.BeginInvoke(focusAction, DispatcherPriority.ApplicationIdle);
             }
         }

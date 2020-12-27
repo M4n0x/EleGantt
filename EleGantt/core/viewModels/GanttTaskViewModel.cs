@@ -19,22 +19,9 @@ namespace EleGantt.core.viewModels
             this._task = task;
         }
 
-
-        public Visibility ShowTextBlock
-        {
-            get { return _isEdition ? Visibility.Collapsed : Visibility.Visible; }
-        }
-        public Visibility ShowTextBox
-        {
-            get { return _isEdition ? Visibility.Visible : Visibility.Collapsed; }
-        }
-
         public GanttTaskModel GanttTaskModel
         {
-            get
-            {
-                return _task;
-            }
+            get { return _task; }
         }
 
         public bool IsSelected
@@ -108,8 +95,7 @@ namespace EleGantt.core.viewModels
             {
                 return _enableEditionCmd ?? (_enableEditionCmd = new RelayCommand(x =>
                 {
-                    Trace.WriteLine("Enable edit");
-                    if (!IsEdition)
+                    if (!IsEdition) // to not fired OnPropertyChange
                         IsEdition = true;
                 }));
             }
@@ -123,8 +109,7 @@ namespace EleGantt.core.viewModels
             {
                 return _disableEditionCmd ?? (_disableEditionCmd = new RelayCommand(x =>
                 {
-                    Trace.WriteLine("Disable edit");
-                    if (IsEdition)
+                    if (IsEdition) // to not fired OnPropertyChange
                         IsEdition = false;
                 }));
             }

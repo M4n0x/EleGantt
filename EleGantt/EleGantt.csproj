@@ -87,6 +87,7 @@
     <Compile Include="core\models\GanttTaskModel.cs" />
     <Compile Include="core\models\MilestoneModel.cs" />
     <Compile Include="core\utils\BoundObservableCollection.cs" />
+    <Compile Include="core\utils\converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="core\viewModels\RelayCommand.cs" />
     <Compile Include="core\viewModels\GanttTaskViewModel.cs" />
     <Compile Include="core\viewModels\GanttViewModel.cs" />
