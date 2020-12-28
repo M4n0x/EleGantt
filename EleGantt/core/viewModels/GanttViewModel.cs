@@ -40,18 +40,34 @@ namespace EleGantt.core.viewModels
                             m => new GanttTaskViewModel(m), // creates a ViewModel from a Model
                             vm => vm.GanttTaskModel,
                             (vm, m) => vm.GanttTaskModel.Equals(m)); // checks if the ViewModel corresponds to the specified model
+            _TaskList.CollectionChanged += (sender, e) => { Saved = false; };
             _MilestoneList = new BoundObservableCollection<MilestoneViewModel, MilestoneModel>(
                             gantt.Milestones,
                             m => new MilestoneViewModel(m),
                             vm => vm.MilestoneModel,
                             (vm,m) => vm.MilestoneModel.Equals(m));
+            _MilestoneList.CollectionChanged += (sender, e) => { Saved = false; };
             OnPropertyChanged(null); //update all fields
             _saved = true;
         }
 
+        public string AppName
+        {
+            get { return "EleGantt - " + (_saved ? _project.Name : _project.Name + " *"); }
+        }
+
+        public bool Saved
+        {
+            get { return _saved; }
+            set
+            {
+                _saved = value;
+                OnPropertyChanged("AppName");
+            }
+        }
         public string Name
         {
-            get { return _saved ? _project.Name : _project.Name + " *"; }
+            get { return _project.Name; }
             set 
             { 
                 _project.Name = value;
@@ -229,6 +245,7 @@ namespace EleGantt.core.viewModels
                     }
 
                     File.WriteAllText(_filePath, JsonConvert.SerializeObject(_project));
+                    _saved = true;
                 }));
             }
         }
