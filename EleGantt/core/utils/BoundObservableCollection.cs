@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 
 namespace EleGantt.core.utils
@@ -16,27 +17,32 @@ namespace EleGantt.core.utils
     //        (vm, m) => vm.Model.Equals(m)); // checks if the ViewModel corresponds to the specified model
     //
     // ref https://stackoverflow.com/questions/2853276/wpf-list-of-viewmodels-bound-to-list-of-model-objects
+    // 
+    // This version is an adaption to two way binding of the code show in the link above
     public class BoundObservableCollection<T, TSource> : ObservableCollection<T>
     {
         private ObservableCollection<TSource> _source;
         private Func<TSource, T> _converter;
+        private Func<T, TSource> _converterBack;
         private Func<T, TSource, bool> _isSameSource;
 
         public BoundObservableCollection(
             ObservableCollection<TSource> source,
             Func<TSource, T> converter,
+            Func<T, TSource> converterBack,
             Func<T, TSource, bool> isSameSource)
             : base()
         {
             _source = source;
             _converter = converter;
+            _converterBack = converterBack;
             _isSameSource = isSameSource;
 
             // Copy items
             AddItems(_source);
 
-            // Subscribe to the source's CollectionChanged event
-            _source.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(_source_CollectionChanged);
+            // Subscribe to the CollectionChanged event
+            CollectionChanged += new NotifyCollectionChangedEventHandler(_target_CollectionChanged);
         }
 
         private void AddItems(IEnumerable<TSource> items)
@@ -47,7 +53,53 @@ namespace EleGantt.core.utils
             }
         }
 
-        void _source_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void AddItemsBack(IEnumerable<T> items, int index = -1)
+        {
+            if (index == -1) index = _source.Count();
+            foreach (var sourceItem in items)
+            {
+                _source.Insert(index,_converterBack(sourceItem));
+            }
+        }
+
+        void _target_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    Trace.WriteLine("new item");
+                    AddItemsBack(e.NewItems.Cast<T>(), e.NewStartingIndex);
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    Trace.WriteLine("moved target");
+                    _source.Move(e.OldStartingIndex, e.NewStartingIndex);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    Trace.WriteLine("remove item");
+                    foreach (var sourceItem in e.OldItems.Cast<T>())
+                    {
+                        var toRemove = _source.First(item => _isSameSource(sourceItem,item));
+                        _source.Remove(toRemove);
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    Trace.WriteLine("replace item");
+                    for (int i = e.NewStartingIndex; i < e.NewItems.Count; i++)
+                    {
+                        _source[i] = _converterBack((T)e.NewItems[i]);
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    Trace.WriteLine("reset item");
+                    _source.Clear();
+                    AddItemsBack(this);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void _source_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -55,13 +107,14 @@ namespace EleGantt.core.utils
                     AddItems(e.NewItems.Cast<TSource>());
                     break;
                 case NotifyCollectionChangedAction.Move:
-                    // Not sure what to do here...
+                    Trace.WriteLine("moved source");
+                    Move(e.OldStartingIndex, e.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var sourceItem in e.OldItems.Cast<TSource>())
                     {
                         var toRemove = this.First(item => _isSameSource(item, sourceItem));
-                        this.Remove(toRemove);
+                        Remove(toRemove);
                     }
                     break;
                 case NotifyCollectionChangedAction.Replace:
@@ -71,12 +124,13 @@ namespace EleGantt.core.utils
                     }
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    this.Clear();
-                    this.AddItems(_source);
+                    Clear();
+                    AddItems(_source);
                     break;
                 default:
                     break;
             }
         }
+
     }
 }

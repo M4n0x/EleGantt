@@ -1,6 +1,9 @@
 ﻿using EleGantt.core.viewModels;
 using System;
+using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace EleGantt
 {
@@ -12,22 +15,23 @@ namespace EleGantt
         private GanttViewModel viewModel;
         public MainWindow()
         {
-            viewModel = new GanttViewModel();
+            viewModel = new GanttViewModel(); // TODO load model in the view direct 
 
             //@Todo replace by data manager
-            viewModel.Name = "test";
             viewModel.ClosingRequest += delegate { Close(); };
 
             DataContext = viewModel;
             InitializeComponent();
-
-            viewModel.Name = "oopsie";
         }
 
-        public void OnListDoubleClick(object sender, EventArgs e)
+        private void inputTask_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            viewModel.EnableEditionCmd.Execute(null);
+            var input = sender as TextBox;
+            if (input.Visibility == Visibility.Visible)
+            {
+                Action focusAction = () => input.Focus(); //delay focus action cause mainwindows can be busy
+                this.Dispatcher.BeginInvoke(focusAction, DispatcherPriority.ApplicationIdle);
+            }
         }
-
     }
 }

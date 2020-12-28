@@ -4,9 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dd="urn:gong-wpf-dragdrop"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:converters="clr-namespace:EleGantt.core.utils.converters"
         xmlns:local="clr-namespace:EleGantt"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="{Binding AppName}" Height="450" Width="800"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -18,7 +20,18 @@
         MinHeight="300px"
         MinWidth="500px">
 
+    <Window.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
+    </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="S" Command="{Binding SaveProjectCmd}" />
+        <KeyBinding Modifiers="Control" Key="O" Command="{Binding OpenProjectCmd}" />
+        <KeyBinding Modifiers="Control" Key="Q" Command="{Binding CloseCmd}" />
+    </Window.InputBindings>
+
     <Grid>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="30px"/>
             <RowDefinition Height="5*"/>
@@ -42,17 +55,28 @@
                           SelectedItem="{Binding SelectedTask}" 
                           HorizontalContentAlignment="Stretch" 
                           VerticalContentAlignment="Stretch">
-                <ListView.ItemContainerStyle>
-                    <!-- WORKAROUND https://stackoverflow.com/questions/7755003/wpf-eventsetter-handler-binding-in-style -->
-                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
-                        <EventSetter Event="MouseDoubleClick" Handler="OnListDoubleClick"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate >
+                <ListView.ItemTemplate>
                     <DataTemplate>
                         <WrapPanel>
-                            <TextBlock x:Name="labelTask" Text="{Binding Name}" Visibility="{Binding showTextBlock}" FontWeight="Bold" HorizontalAlignment="Left" />
-                            <TextBox x:Name="inputTask" Text="{Binding Name}" Visibility="{Binding showTextBox}" FontWeight="Bold" HorizontalAlignment="Left"/>
+                            <TextBox x:Name="inputTask" Text="{Binding Name}" IsVisibleChanged="inputTask_IsVisibleChanged" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}}" FontWeight="Bold" HorizontalAlignment="Stretch">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="LostFocus">
+                                        <i:InvokeCommandAction Command="{Binding DisableEditionCmd}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Esc" Command="{Binding DisableEditionCmd}"/>
+                                    <KeyBinding Key="Enter" Command="{Binding DisableEditionCmd}"/>
+                                </TextBox.InputBindings>
+                            </TextBox>
+                            <TextBlock x:Name="labelTask" Text="{Binding Name}" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}, ConverterParameter=1}" FontWeight="Bold" HorizontalAlignment="Stretch" >
+                                <TextBlock.InputBindings>
+                                    <KeyBinding Key="F2"
+                                                Command="{Binding EnableEditionCmd}"/>
+                                    <MouseBinding MouseAction="LeftDoubleClick"
+                                                  Command="{Binding EnableEditionCmd}"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
                         </WrapPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -60,9 +84,6 @@
                     <KeyBinding Key="Delete" 
                                     CommandParameter="{Binding ElementName=sideListView, Path=SelectedItems}"
                                     Command="{Binding RemoveSelectedTasksCmd}" />
-                    <KeyBinding Key="F2" Command="{Binding EnableEditionCmd}"/>
-                    <KeyBinding Key="Enter" Command="{Binding DisableEditionCmd}"/>
-                    <KeyBinding Key="Esc" Command="{Binding DisableEditionCmd}"/>
                 </ListView.InputBindings>
             </ListView>
             <GridSplitter Grid.Column="1"
@@ -90,10 +111,10 @@
             <DockPanel>
                 <Menu DockPanel.Dock="Top">
                     <MenuItem Header="_File" FontSize="15" Height="30">
-                        <MenuItem Header="_New" />
-                        <MenuItem Header="_New Task" Command="{Binding AddTaskCmd}" />
-                        <MenuItem Header="_Open" />
-                        <MenuItem Header="_Save" />
+                        <MenuItem Header="_New" Command="{Binding CreateNewProjectCmd}" />
+                        <MenuItem Header="_Open" Command="{Binding OpenProjectCmd}"/>
+                        <MenuItem Header="_Save" Command="{Binding SaveProjectCmd}"/>
+                        <MenuItem Header="_Save under..." CommandParameter="u" Command="{Binding SaveProjectCmd}"/>
                         <Separator />
                         <MenuItem Header="_Exit" Command="{Binding CloseCmd}"/>
                     </MenuItem>

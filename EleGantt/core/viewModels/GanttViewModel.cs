@@ -7,6 +7,10 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using EleGantt.core.utils;
+using Newtonsoft.Json;
+using Microsoft.Win32;
+using System.IO;
 
 namespace EleGantt.core.viewModels
 {
@@ -14,22 +18,53 @@ namespace EleGantt.core.viewModels
     {
         private ObservableCollection<GanttTaskViewModel> _TaskList;
         private ObservableCollection<MilestoneViewModel> _MilestoneList;
-        private Gantt _project;
+        private GanttModel _project;
         private GanttTaskViewModel _selectedTask;
-        private GanttTaskViewModel _editing;
+        private bool _saved = true;
+        private string _filePath;
 
-        public GanttViewModel() : this(new Gantt("New project")) { }
+        public GanttViewModel() : this(new GanttModel("New project")) { }
 
-        public GanttViewModel(Gantt gantt)
+        public GanttViewModel(GanttModel gantt)
         {
-            _project = gantt;
-            _TaskList = new ObservableCollection<GanttTaskViewModel>
-            {
-                new GanttTaskViewModel(new GanttTask{Name="test",  DateStart=DateTime.Now, DateEnd=DateTime.Now.AddDays(2)}),
-                new GanttTaskViewModel(new GanttTask{Name="Test 123",  DateStart=DateTime.Now.AddDays(3), DateEnd=DateTime.Now.AddDays(6)}),
-            };
+            LoadGanttModel(gantt);
         }
 
+        private void LoadGanttModel(GanttModel gantt)
+        {
+            _selectedTask = null;
+            _project = gantt;
+            _filePath = null;
+            _TaskList = new BoundObservableCollection<GanttTaskViewModel, GanttTaskModel>(
+                            gantt.Tasks,
+                            m => new GanttTaskViewModel(m), // creates a ViewModel from a Model
+                            vm => vm.GanttTaskModel,
+                            (vm, m) => vm.GanttTaskModel.Equals(m)); // checks if the ViewModel corresponds to the specified model
+            _TaskList.CollectionChanged += (sender, e) => { Saved = false; };
+            _MilestoneList = new BoundObservableCollection<MilestoneViewModel, MilestoneModel>(
+                            gantt.Milestones,
+                            m => new MilestoneViewModel(m),
+                            vm => vm.MilestoneModel,
+                            (vm,m) => vm.MilestoneModel.Equals(m));
+            _MilestoneList.CollectionChanged += (sender, e) => { Saved = false; };
+            OnPropertyChanged(null); //update all fields
+            _saved = true;
+        }
+
+        public string AppName
+        {
+            get { return "EleGantt - " + (_saved ? _project.Name : _project.Name + " *"); }
+        }
+
+        public bool Saved
+        {
+            get { return _saved; }
+            set
+            {
+                _saved = value;
+                OnPropertyChanged("AppName");
+            }
+        }
         public string Name
         {
             get { return _project.Name; }
@@ -69,7 +104,7 @@ namespace EleGantt.core.viewModels
             }
         }
 
-        public void AddTask(GanttTask task)
+        public void AddTask(GanttTaskModel task)
         {
             AddTask(new GanttTaskViewModel(task));
         }
@@ -92,7 +127,7 @@ namespace EleGantt.core.viewModels
             }
         }
 
-        public void AddMilestone(Milestone milestone)
+        public void AddMilestone(MilestoneModel milestone)
         {
             AddMilestone(new MilestoneViewModel(milestone));
         }
@@ -111,15 +146,25 @@ namespace EleGantt.core.viewModels
             }
         }
 
-        public void DoSerialization()
+        private bool doFilePathSet()
         {
-            //@TODO
-            //Use project's UUID to preserve consistency between projects
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "EleGantt Project (*.elegantt)|*.elegantt";
+            saveFileDialog.DefaultExt = "elegantt";
+            saveFileDialog.AddExtension = true;
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                _filePath = saveFileDialog.FileName;
+                return true;
+            } else
+            {
+                return false;
+            }
         }
 
         protected void OnClosingRequest()
         {
-            DoSerialization();
             if (ClosingRequest != null)
             {
                 ClosingRequest(this, EventArgs.Empty);
@@ -146,46 +191,11 @@ namespace EleGantt.core.viewModels
                 return _addTaskCmd ?? (_addTaskCmd = new RelayCommand(x => 
                 {
                     //TODO Adjust datestart date related to the project, same for the end date 
-                    var item = new GanttTaskViewModel(new GanttTask { Name = "New Task", DateStart = DateTime.Now, DateEnd = DateTime.Now.AddDays(2) });
+                    var item = new GanttTaskViewModel(new GanttTaskModel { Name = "New Task", DateStart = DateTime.Now, DateEnd = DateTime.Now.AddDays(2) });
                     AddTask(item);
                     SelectedTask = item;
                 }));
             } 
-        }
-
-        private RelayCommand _enableEditionCmd;
-        public ICommand EnableEditionCmd
-        {
-            get
-            {
-                return _enableEditionCmd ?? (_enableEditionCmd = new RelayCommand(x =>
-                {
-                    Trace.WriteLine("DoubleClick");
-                    DisableEditionCmd.Execute(x);
-                    if (SelectedTask!=null)
-                    {
-                        SelectedTask.IsEdition = true;
-                        _editing = SelectedTask;
-                    }
-                }));
-            }
-        }
-
-        private RelayCommand _disableEditionCmd;
-
-        public ICommand DisableEditionCmd
-        {
-            get
-            {
-                return _disableEditionCmd ?? (_disableEditionCmd = new RelayCommand(x =>
-                {
-                    if (_editing != null)
-                    {
-                        _editing.IsEdition = false;
-                        _editing = null;
-                    }
-                }));
-            }
         }
 
         private RelayCommand _removeSelectedTasksCmd;
@@ -193,12 +203,69 @@ namespace EleGantt.core.viewModels
         {
             get
             {
-                return _removeSelectedTasksCmd ?? (_removeSelectedTasksCmd = new RelayCommand(selectedItems => {
+                return _removeSelectedTasksCmd ?? (_removeSelectedTasksCmd = new RelayCommand(selectedItems => 
+                {
                     var listItems = selectedItems as IList;
                     List<GanttTaskViewModel> items = listItems.Cast<GanttTaskViewModel>().ToList();
                     if (items != null && items.Count > 0)
                     {
                         foreach (GanttTaskViewModel item in items) _TaskList.Remove(item);
+                    }
+                }));
+            }
+        }
+
+        private RelayCommand _createNewProjectCmd;
+
+        public ICommand CreateNewProjectCmd
+        {
+            get
+            {
+                return _createNewProjectCmd ?? (_createNewProjectCmd = new RelayCommand(x =>
+                {
+                    LoadGanttModel(new GanttModel("New project"));
+                }));
+            }
+        }
+
+        private RelayCommand _saveProjectCmd;
+
+        public ICommand SaveProjectCmd
+        {
+            get
+            {
+                return _saveProjectCmd ?? (_saveProjectCmd = new RelayCommand(x =>
+                {
+                    if (_filePath == null || (x != null && x.ToString().Equals("u")))
+                    {
+                        if (!doFilePathSet())
+                        {
+                            return; // no path has been provided
+                        }
+                    }
+
+                    File.WriteAllText(_filePath, JsonConvert.SerializeObject(_project));
+                    _saved = true;
+                }));
+            }
+        }
+
+        private RelayCommand _openProjectCmd;
+
+        public ICommand OpenProjectCmd
+        {
+            get
+            {
+                return _openProjectCmd ?? (_openProjectCmd = new RelayCommand(x =>
+                {
+                    OpenFileDialog openFileDialog = new OpenFileDialog();
+                    openFileDialog.Filter = "EleGantt Project (*.elegantt)|*.elegantt";
+                    if (openFileDialog.ShowDialog() == true)
+                    {
+                        var input = File.ReadAllText(openFileDialog.FileName);
+                        GanttModel gantt = JsonConvert.DeserializeObject<GanttModel>(input);
+                        LoadGanttModel(gantt);
+                        _filePath = openFileDialog.FileName;
                     }
                 }));
             }
