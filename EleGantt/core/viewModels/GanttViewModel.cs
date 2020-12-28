@@ -11,6 +11,7 @@ using EleGantt.core.utils;
 using Newtonsoft.Json;
 using Microsoft.Win32;
 using System.IO;
+using MaterialDesignThemes.Wpf;
 
 namespace EleGantt.core.viewModels
 {
@@ -22,6 +23,7 @@ namespace EleGantt.core.viewModels
         private GanttTaskViewModel _selectedTask;
         private bool _saved = true;
         private string _filePath;
+        private readonly PaletteHelper _paletteHelper = new PaletteHelper();
 
         public GanttViewModel() : this(new GanttModel("New project")) { }
 
@@ -56,6 +58,16 @@ namespace EleGantt.core.viewModels
             get { return "EleGantt - " + (_saved ? _project.Name : _project.Name + " *"); }
         }
 
+        public bool IsDark
+        {
+            get { return Properties.Settings.Default.isDark; }
+            set
+            {
+                Properties.Settings.Default.isDark = value;
+                Properties.Settings.Default.Save();
+                OnPropertyChanged("IsDark");
+            }
+        }
         public bool Saved
         {
             get { return _saved; }
@@ -115,10 +127,6 @@ namespace EleGantt.core.viewModels
             OnPropertyChanged("Tasks");
         }
 
-        public void RemoveSelectedTasks(object selectedItems)
-        {
-            
-        }
         public void RemoveTask(GanttTaskViewModel task)
         {
             if (_TaskList.Remove(task))
@@ -148,10 +156,12 @@ namespace EleGantt.core.viewModels
 
         private bool doFilePathSet()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "EleGantt Project (*.elegantt)|*.elegantt";
-            saveFileDialog.DefaultExt = "elegantt";
-            saveFileDialog.AddExtension = true;
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "EleGantt Project (*.elegantt)|*.elegantt",
+                DefaultExt = "elegantt",
+                AddExtension = true
+            };
 
             if (saveFileDialog.ShowDialog() == true)
             {
@@ -215,6 +225,23 @@ namespace EleGantt.core.viewModels
             }
         }
 
+        private RelayCommand _editSelectedTasksCmd;
+        public ICommand EditSelectedTasksCmd
+        {
+            get
+            {
+                return _editSelectedTasksCmd ?? (_editSelectedTasksCmd = new RelayCommand(selectedItems =>
+                {
+                    var listItems = selectedItems as IList;
+                    List<GanttTaskViewModel> items = listItems.Cast<GanttTaskViewModel>().ToList();
+                    if (items != null && items.Count > 0)
+                    {
+                        items[0].IsEdition = true;
+                    }
+                }));
+            }
+        }
+
         private RelayCommand _createNewProjectCmd;
 
         public ICommand CreateNewProjectCmd
@@ -245,7 +272,7 @@ namespace EleGantt.core.viewModels
                     }
 
                     File.WriteAllText(_filePath, JsonConvert.SerializeObject(_project));
-                    _saved = true;
+                    Saved = true;
                 }));
             }
         }
@@ -258,8 +285,10 @@ namespace EleGantt.core.viewModels
             {
                 return _openProjectCmd ?? (_openProjectCmd = new RelayCommand(x =>
                 {
-                    OpenFileDialog openFileDialog = new OpenFileDialog();
-                    openFileDialog.Filter = "EleGantt Project (*.elegantt)|*.elegantt";
+                    OpenFileDialog openFileDialog = new OpenFileDialog
+                    {
+                        Filter = "EleGantt Project (*.elegantt)|*.elegantt"
+                    };
                     if (openFileDialog.ShowDialog() == true)
                     {
                         var input = File.ReadAllText(openFileDialog.FileName);
@@ -275,10 +304,7 @@ namespace EleGantt.core.viewModels
         private RelayCommand _closeCmd;
         public ICommand CloseCmd
         {
-            get
-            {
-                return _closeCmd ?? (_closeCmd = new RelayCommand(x => OnClosingRequest()));
-            }
+            get { return _closeCmd ?? (_closeCmd = new RelayCommand(x => OnClosingRequest())); }
         }
 
         public event EventHandler ClosingRequest;

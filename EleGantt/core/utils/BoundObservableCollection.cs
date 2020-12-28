@@ -67,15 +67,12 @@ namespace EleGantt.core.utils
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    Trace.WriteLine("new item");
                     AddItemsBack(e.NewItems.Cast<T>(), e.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Move:
-                    Trace.WriteLine("moved target");
                     _source.Move(e.OldStartingIndex, e.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    Trace.WriteLine("remove item");
                     foreach (var sourceItem in e.OldItems.Cast<T>())
                     {
                         var toRemove = _source.First(item => _isSameSource(sourceItem,item));
@@ -83,14 +80,12 @@ namespace EleGantt.core.utils
                     }
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    Trace.WriteLine("replace item");
                     for (int i = e.NewStartingIndex; i < e.NewItems.Count; i++)
                     {
                         _source[i] = _converterBack((T)e.NewItems[i]);
                     }
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    Trace.WriteLine("reset item");
                     _source.Clear();
                     AddItemsBack(this);
                     break;
@@ -107,7 +102,6 @@ namespace EleGantt.core.utils
                     AddItems(e.NewItems.Cast<TSource>());
                     break;
                 case NotifyCollectionChangedAction.Move:
-                    Trace.WriteLine("moved source");
                     Move(e.OldStartingIndex, e.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Remove:
