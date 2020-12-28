@@ -1,4 +1,5 @@
 ﻿using EleGantt.core.viewModels;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -13,25 +14,40 @@ namespace EleGantt
     public partial class MainWindow : Window
     {
         private GanttViewModel viewModel;
+        private readonly PaletteHelper _paletteHelper = new PaletteHelper();
         public MainWindow()
         {
             viewModel = new GanttViewModel(); // TODO load model in the view direct 
 
-            //@Todo replace by data manager
             viewModel.ClosingRequest += delegate { Close(); };
 
             DataContext = viewModel;
             InitializeComponent();
+
+            ApplyCurrentTheme();
         }
 
+        private void ApplyCurrentTheme()
+        {
+            ITheme theme = _paletteHelper.GetTheme();
+            IBaseTheme baseTheme = Properties.Settings.Default.isDark ? new MaterialDesignDarkTheme() : (IBaseTheme)new MaterialDesignLightTheme();
+            theme.SetBaseTheme(baseTheme);
+            _paletteHelper.SetTheme(theme);
+        }
+        
         private void inputTask_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var input = sender as TextBox;
             if (input.Visibility == Visibility.Visible)
             {
                 Action focusAction = () => input.Focus(); //delay focus action cause mainwindows can be busy
-                this.Dispatcher.BeginInvoke(focusAction, DispatcherPriority.ApplicationIdle);
+                Dispatcher.BeginInvoke(focusAction, DispatcherPriority.ApplicationIdle);
             }
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyCurrentTheme();
         }
     }
 }

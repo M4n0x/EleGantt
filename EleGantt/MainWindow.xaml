@@ -6,7 +6,6 @@
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:converters="clr-namespace:EleGantt.core.utils.converters"
-        xmlns:local="clr-namespace:EleGantt"
         mc:Ignorable="d"
         Title="{Binding AppName}" Height="450" Width="800"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -47,7 +46,8 @@
                 <ColumnDefinition Width="2*" MinWidth="200px"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="LightGray" />
+            <!--<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="LightGray" />-->
+
             <TextBlock  Grid.Row="0" TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Projet Name'}" VerticalAlignment="Top" Padding="10px" FontWeight="Bold"/>
             <ListView x:Name="sideListView" Margin="10,10,10,10" Grid.Row="1" ItemsSource="{Binding Tasks}"  
                           dd:DragDrop.IsDragSource="True" 
@@ -57,7 +57,7 @@
                           VerticalContentAlignment="Stretch">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <WrapPanel>
+                        <StackPanel>
                             <TextBox x:Name="inputTask" Text="{Binding Name}" IsVisibleChanged="inputTask_IsVisibleChanged" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}}" FontWeight="Bold" HorizontalAlignment="Stretch">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="LostFocus">
@@ -77,19 +77,21 @@
                                                   Command="{Binding EnableEditionCmd}"/>
                                 </TextBlock.InputBindings>
                             </TextBlock>
-                        </WrapPanel>
+                        </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
                 <ListView.InputBindings>
                     <KeyBinding Key="Delete" 
                                     CommandParameter="{Binding ElementName=sideListView, Path=SelectedItems}"
                                     Command="{Binding RemoveSelectedTasksCmd}" />
+                    <KeyBinding Key="F2" 
+                                    CommandParameter="{Binding ElementName=sideListView, Path=SelectedItems}"
+                                    Command="{Binding EditSelectedTasksCmd}" />
                 </ListView.InputBindings>
             </ListView>
             <GridSplitter Grid.Column="1"
               HorizontalAlignment="Left"
               VerticalAlignment="Stretch"
-              Background="LightGray" 
               ShowsPreview="True"
               Width="1"
               Grid.RowSpan="3"
@@ -115,6 +117,9 @@
                         <MenuItem Header="_Open" Command="{Binding OpenProjectCmd}"/>
                         <MenuItem Header="_Save" Command="{Binding SaveProjectCmd}"/>
                         <MenuItem Header="_Save under..." CommandParameter="u" Command="{Binding SaveProjectCmd}"/>
+                        <MenuItem Header="_Preferences">
+                            <MenuItem Header="_Dark Theme" IsCheckable="True" IsChecked="{Binding IsDark}" Click="MenuItem_Click" />
+                        </MenuItem>
                         <Separator />
                         <MenuItem Header="_Exit" Command="{Binding CloseCmd}"/>
                     </MenuItem>
