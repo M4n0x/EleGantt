@@ -9,17 +9,8 @@ namespace EleGantt.core.models
     {
         public string Name;
         public string UUID;
-        public string Path;
-        public ObservableCollection<GanttTaskModel> Tasks = new ObservableCollection<GanttTaskModel>
-            {
-                new GanttTaskModel{Name="test",  DateStart=DateTime.Now, DateEnd=DateTime.Now.AddDays(2)},
-                new GanttTaskModel{Name="Test 123",  DateStart=DateTime.Now.AddDays(3), DateEnd=DateTime.Now.AddDays(6)},
-            };
-        public ObservableCollection<MilestoneModel> Milestones = new ObservableCollection<MilestoneModel>
-            {
-                new MilestoneModel{Name="test",  Date=DateTime.Now},
-                new MilestoneModel{Name="Test 123",  Date=DateTime.Now.AddDays(3)},
-            };
+        public ObservableCollection<GanttTaskModel> Tasks;
+        public ObservableCollection<MilestoneModel> Milestones;
         public GanttModel() { }
         public GanttModel(string Name) : this(Name, Guid.NewGuid().ToString()) { }
 
@@ -27,6 +18,8 @@ namespace EleGantt.core.models
         {
             this.Name = Name;
             this.UUID = UUID;
+            Tasks = new ObservableCollection<GanttTaskModel>();
+            Milestones = new ObservableCollection<MilestoneModel>();
         }
     }
 }

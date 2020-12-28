@@ -24,6 +24,12 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
     </Window.Resources>
 
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="S" Command="{Binding SaveProjectCmd}" />
+        <KeyBinding Modifiers="Control" Key="O" Command="{Binding OpenProjectCmd}" />
+        <KeyBinding Modifiers="Control" Key="Q" Command="{Binding CloseCmd}" />
+    </Window.InputBindings>
+
     <Grid>
         
         <Grid.RowDefinitions>
@@ -108,6 +114,7 @@
                         <MenuItem Header="_New" Command="{Binding CreateNewProjectCmd}" />
                         <MenuItem Header="_Open" Command="{Binding OpenProjectCmd}"/>
                         <MenuItem Header="_Save" Command="{Binding SaveProjectCmd}"/>
+                        <MenuItem Header="_Save under..." CommandParameter="u" Command="{Binding SaveProjectCmd}"/>
                         <Separator />
                         <MenuItem Header="_Exit" Command="{Binding CloseCmd}"/>
                     </MenuItem>

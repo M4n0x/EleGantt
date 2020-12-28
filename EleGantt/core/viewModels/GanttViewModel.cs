@@ -9,6 +9,8 @@ using System.Collections;
 using System.Linq;
 using EleGantt.core.utils;
 using Newtonsoft.Json;
+using Microsoft.Win32;
+using System.IO;
 
 namespace EleGantt.core.viewModels
 {
@@ -18,8 +20,8 @@ namespace EleGantt.core.viewModels
         private ObservableCollection<MilestoneViewModel> _MilestoneList;
         private GanttModel _project;
         private GanttTaskViewModel _selectedTask;
-        private GanttTaskViewModel _editing;
         private bool _saved = true;
+        private string _filePath;
 
         public GanttViewModel() : this(new GanttModel("New project")) { }
 
@@ -31,22 +33,25 @@ namespace EleGantt.core.viewModels
         private void LoadGanttModel(GanttModel gantt)
         {
             _selectedTask = null;
-            _editing = null;
             _project = gantt;
+            _filePath = null;
             _TaskList = new BoundObservableCollection<GanttTaskViewModel, GanttTaskModel>(
                             gantt.Tasks,
                             m => new GanttTaskViewModel(m), // creates a ViewModel from a Model
+                            vm => vm.GanttTaskModel,
                             (vm, m) => vm.GanttTaskModel.Equals(m)); // checks if the ViewModel corresponds to the specified model
             _MilestoneList = new BoundObservableCollection<MilestoneViewModel, MilestoneModel>(
                             gantt.Milestones,
                             m => new MilestoneViewModel(m),
+                            vm => vm.MilestoneModel,
                             (vm,m) => vm.MilestoneModel.Equals(m));
-            OnPropertyChanged(null); //update all fields 
+            OnPropertyChanged(null); //update all fields
+            _saved = true;
         }
 
         public string Name
         {
-            get { return _project.Name; }
+            get { return _saved ? _project.Name : _project.Name + " *"; }
             set 
             { 
                 _project.Name = value;
@@ -125,15 +130,25 @@ namespace EleGantt.core.viewModels
             }
         }
 
-        public void DoSerialization()
+        private bool doFilePathSet()
         {
-            //@TODO
-            Trace.WriteLine(JsonConvert.SerializeObject(_project));
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "EleGantt Project (*.elegantt)|*.elegantt";
+            saveFileDialog.DefaultExt = "elegantt";
+            saveFileDialog.AddExtension = true;
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                _filePath = saveFileDialog.FileName;
+                return true;
+            } else
+            {
+                return false;
+            }
         }
 
         protected void OnClosingRequest()
         {
-            DoSerialization();
             if (ClosingRequest != null)
             {
                 ClosingRequest(this, EventArgs.Empty);
@@ -205,9 +220,15 @@ namespace EleGantt.core.viewModels
             {
                 return _saveProjectCmd ?? (_saveProjectCmd = new RelayCommand(x =>
                 {
-                    Trace.WriteLine("Save project... TODO");
-                    Trace.WriteLine(JsonConvert.SerializeObject(_project));
-                    LoadGanttModel(JsonConvert.DeserializeObject<GanttModel>(JsonConvert.SerializeObject(_project)));
+                    if (_filePath == null || (x != null && x.ToString().Equals("u")))
+                    {
+                        if (!doFilePathSet())
+                        {
+                            return; // no path has been provided
+                        }
+                    }
+
+                    File.WriteAllText(_filePath, JsonConvert.SerializeObject(_project));
                 }));
             }
         }
@@ -220,7 +241,15 @@ namespace EleGantt.core.viewModels
             {
                 return _openProjectCmd ?? (_openProjectCmd = new RelayCommand(x =>
                 {
-                    Trace.WriteLine("Open project... TODO");
+                    OpenFileDialog openFileDialog = new OpenFileDialog();
+                    openFileDialog.Filter = "EleGantt Project (*.elegantt)|*.elegantt";
+                    if (openFileDialog.ShowDialog() == true)
+                    {
+                        var input = File.ReadAllText(openFileDialog.FileName);
+                        GanttModel gantt = JsonConvert.DeserializeObject<GanttModel>(input);
+                        LoadGanttModel(gantt);
+                        _filePath = openFileDialog.FileName;
+                    }
                 }));
             }
         }
