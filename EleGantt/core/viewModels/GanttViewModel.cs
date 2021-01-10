@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using EleGantt.core.models;
 using System.Windows.Input;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
@@ -11,7 +10,7 @@ using EleGantt.core.utils;
 using Newtonsoft.Json;
 using Microsoft.Win32;
 using System.IO;
-using MaterialDesignThemes.Wpf;
+using System.Diagnostics;
 
 namespace EleGantt.core.viewModels
 {
@@ -21,11 +20,10 @@ namespace EleGantt.core.viewModels
         private ObservableCollection<MilestoneViewModel> _MilestoneList;
         private GanttModel _project;
         private GanttTaskViewModel _selectedTask;
-        private bool _saved = true;
-        private string _filePath;
-        private readonly PaletteHelper _paletteHelper = new PaletteHelper();
+        private bool _saved = true; // allow to know if there is pending modifications
+        private string _filePath; // save the path of the current loaded project
 
-        public GanttViewModel() : this(new GanttModel("New project")) { }
+        public GanttViewModel() : this(new GanttModel("Project Name")) { }
 
         public GanttViewModel(GanttModel gantt)
         {
@@ -40,17 +38,21 @@ namespace EleGantt.core.viewModels
             _TaskList = new BoundObservableCollection<GanttTaskViewModel, GanttTaskModel>(
                             gantt.Tasks,
                             m => new GanttTaskViewModel(m), // creates a ViewModel from a Model
-                            vm => vm.GanttTaskModel,
+                            vm => vm.GanttTaskModel, // retrieve the source object
                             (vm, m) => vm.GanttTaskModel.Equals(m)); // checks if the ViewModel corresponds to the specified model
-            _TaskList.CollectionChanged += (sender, e) => { Saved = false; };
             _MilestoneList = new BoundObservableCollection<MilestoneViewModel, MilestoneModel>(
                             gantt.Milestones,
-                            m => new MilestoneViewModel(m),
-                            vm => vm.MilestoneModel,
-                            (vm,m) => vm.MilestoneModel.Equals(m));
+                            m => new MilestoneViewModel(m), // creates a ViewModel from a Model
+                            vm => vm.MilestoneModel, // retrieve the source object
+                            (vm,m) => vm.MilestoneModel.Equals(m)); // checks if the ViewModel corresponds to the specified model
+
+            // this allow to track modifications on project (this is basic, should be improved)
+            _TaskList.CollectionChanged += (sender, e) => { Saved = false; }; 
             _MilestoneList.CollectionChanged += (sender, e) => { Saved = false; };
+
             OnPropertyChanged(null); //update all fields
-            _saved = true;
+
+            Saved = false; // no modification has pending !
         }
 
         public string AppName
@@ -60,10 +62,10 @@ namespace EleGantt.core.viewModels
 
         public bool IsDark
         {
-            get { return Properties.Settings.Default.isDark; }
+            get { return Properties.Settings.Default.isDark; } // special we return the settings provided by the user
             set
             {
-                Properties.Settings.Default.isDark = value;
+                Properties.Settings.Default.isDark = value; // if the user change the theme we change it in the settings to retrieve it when the app is closed
                 Properties.Settings.Default.Save();
                 OnPropertyChanged("IsDark");
             }
@@ -84,6 +86,7 @@ namespace EleGantt.core.viewModels
             { 
                 _project.Name = value;
                 OnPropertyChanged("Name");
+                OnPropertyChanged("AppName");
             }
         }
         public GanttTaskViewModel SelectedTask
@@ -154,7 +157,11 @@ namespace EleGantt.core.viewModels
             }
         }
 
-        private bool doFilePathSet()
+        /// <summary>
+        /// This function ask the user a file path and save for later use
+        /// </summary>
+        /// <returns>Return true if user selected a path, false otherwise</returns>
+        private bool DoFilePathSet()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
@@ -175,10 +182,7 @@ namespace EleGantt.core.viewModels
 
         protected void OnClosingRequest()
         {
-            if (ClosingRequest != null)
-            {
-                ClosingRequest(this, EventArgs.Empty);
-            }
+            ClosingRequest?.Invoke(this, EventArgs.Empty);
         }
 
         #region INotifyPropertyChanged Members  
@@ -193,7 +197,11 @@ namespace EleGantt.core.viewModels
         }
         #endregion
 
-        #region Commands 
+        #region Commands
+
+        /// <summary>
+        /// these commands can be called by any component in WPF's view where this modelView is accessible
+        /// </summary>
         private RelayCommand _addTaskCmd;
         public ICommand AddTaskCmd { 
             get 
@@ -209,6 +217,9 @@ namespace EleGantt.core.viewModels
         }
 
         private RelayCommand _removeSelectedTasksCmd;
+        /// <summary>
+        /// This command allow to remove current selected task from the list
+        /// </summary>
         public ICommand RemoveSelectedTasksCmd
         {
             get
@@ -226,6 +237,9 @@ namespace EleGantt.core.viewModels
         }
 
         private RelayCommand _editSelectedTasksCmd;
+        /// <summary>
+        /// This command allow to edit the current selected task
+        /// </summary>
         public ICommand EditSelectedTasksCmd
         {
             get
@@ -243,7 +257,9 @@ namespace EleGantt.core.viewModels
         }
 
         private RelayCommand _createNewProjectCmd;
-
+        /// <summary>
+        /// This command allow to create a new project
+        /// </summary>
         public ICommand CreateNewProjectCmd
         {
             get
@@ -256,18 +272,20 @@ namespace EleGantt.core.viewModels
         }
 
         private RelayCommand _saveProjectCmd;
-
+        /// <summary>
+        /// This command allow to save the current project, specify CommandParameter with "u" to save on a different location
+        /// </summary>
         public ICommand SaveProjectCmd
         {
             get
             {
                 return _saveProjectCmd ?? (_saveProjectCmd = new RelayCommand(x =>
                 {
-                    if (_filePath == null || (x != null && x.ToString().Equals("u")))
+                    if (_filePath == null || (x != null && x.ToString().Equals("u"))) // if the parameter u is set, that mean we want to specify the path
                     {
-                        if (!doFilePathSet())
+                        if (!DoFilePathSet())
                         {
-                            return; // no path has been provided
+                            return; // no path has been provided so we do nothing
                         }
                     }
 
@@ -278,7 +296,9 @@ namespace EleGantt.core.viewModels
         }
 
         private RelayCommand _openProjectCmd;
-
+        /// <summary>
+        /// This command allow to open a project
+        /// </summary>
         public ICommand OpenProjectCmd
         {
             get
@@ -294,7 +314,7 @@ namespace EleGantt.core.viewModels
                         var input = File.ReadAllText(openFileDialog.FileName);
                         GanttModel gantt = JsonConvert.DeserializeObject<GanttModel>(input);
                         LoadGanttModel(gantt);
-                        _filePath = openFileDialog.FileName;
+                        _filePath = openFileDialog.FileName; // we save the path used to allow quick save (CTRL + S)
                     }
                 }));
             }
@@ -302,6 +322,9 @@ namespace EleGantt.core.viewModels
 
 
         private RelayCommand _closeCmd;
+        /// <summary>
+        /// This command is used to close the project
+        /// </summary>
         public ICommand CloseCmd
         {
             get { return _closeCmd ?? (_closeCmd = new RelayCommand(x => OnClosingRequest())); }
