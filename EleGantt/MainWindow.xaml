@@ -91,7 +91,7 @@
                 </ListView.InputBindings>
             </ListView>
 
-            <controls1:UniformGrid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Rows="{Binding Tasks.length}">
+            <controls1:UniformGrid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Rows="{Binding Tasks.Count}">
                 <Border Background="AliceBlue" Grid.ColumnSpan="2">
                     <TextBlock Text="1"/>
                 </Border>
