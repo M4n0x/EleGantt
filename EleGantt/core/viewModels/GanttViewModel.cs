@@ -12,7 +12,6 @@ namespace EleGantt.core.viewModels
         private IList<GanttTask> _TaskList;
         private IList<Milestone> _MilestoneList;
         private string _name;
-        RowCount
 
         public string Name
         {

@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls" xmlns:controls1="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -40,23 +41,31 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Grid x:Name="taskGrid" Row="0" RowSpan="2" Column="1" 
-                            ShowGridLines="True"
-                            local:GridHelpers.RowCount="{Binding RowCount}"
-                            local:GridHelpers.ColumnCount="{Binding ColumnCount}">
-                <!-- Grid definiton, rows and columns-->
-                <Grid.RowDefinitions ItemsSource="{Binding Tasks}">
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="1" Grid.Column="1">
-                Test
-                </TextBlock>
-            </Grid>
-            
+
+            <controls1:UniformGrid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Rows="{Binding Tasks.length}">
+                <Border Background="AliceBlue" Grid.ColumnSpan="2">
+                    <TextBlock Text="1"/>
+                </Border>
+                <Border Background="Cornsilk">
+                    <TextBlock Text="2"/>
+                </Border>
+                <Border Background="DarkSalmon">
+                    <TextBlock Text="3"/>
+                </Border>
+                <Border Background="Gainsboro" Grid.RowSpan="2">
+                    <TextBlock Text="4"/>
+                </Border>
+                <Border Background="LightBlue">
+                    <TextBlock Text="5"/>
+                </Border>
+                <Border Background="MediumAquamarine">
+                    <TextBlock Text="6"/>
+                </Border>
+                <Border Background="MistyRose">
+                    <TextBlock Text="7"/>
+                </Border>
+            </controls1:UniformGrid>
+
             <GridSplitter Grid.Column="1"
               HorizontalAlignment="Left"
               VerticalAlignment="Stretch"
