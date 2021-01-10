@@ -17,17 +17,9 @@ namespace EleGantt
         private readonly PaletteHelper _paletteHelper = new PaletteHelper();
         public MainWindow()
         {
-<<<<<<< HEAD
-            var viewModel = new GanttViewModel
-            {
-                //@Todo replace by data manager
-                Name = "test"
-            };
-=======
             viewModel = new GanttViewModel(); // TODO load model in the view direct 
 
             viewModel.ClosingRequest += delegate { Close(); };
->>>>>>> develop
 
             DataContext = viewModel;
             InitializeComponent();
