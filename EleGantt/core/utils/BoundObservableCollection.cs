@@ -59,7 +59,7 @@ namespace EleGantt.core.utils
         {
             foreach (var sourceItem in items)
             {
-                Insert(index, _converter(sourceItem));
+                Add(_converter(sourceItem));
             }
         }
 
