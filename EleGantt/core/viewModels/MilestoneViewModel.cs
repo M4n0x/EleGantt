@@ -1,34 +1,45 @@
 ﻿using System;
 using System.ComponentModel;
+using EleGantt.core.models;
 
-namespace EleGantt.core.models
+namespace EleGantt.core.viewModels
 {
-    internal class Milestone : INotifyPropertyChanged
+    internal class MilestoneViewModel : INotifyPropertyChanged
     {
-        private string _name;
-        private DateTime _date;
-        private string Name 
+        private MilestoneModel _milestone;
+
+        public MilestoneViewModel(MilestoneModel milestone)
+        {
+            _milestone = milestone;
+        }
+
+        public MilestoneModel MilestoneModel
+        {
+            get { return _milestone; }
+        }
+
+        public string Name 
         {
             set
             {
-                _name = value;
+                _milestone.Name = value;
                 OnPropertyChanged("Name");
             }
             get
             {
-                return _name;
+                return _milestone.Name;
             }
         }
-        private DateTime Date
+        public DateTime Date
         {
             set
             {
-                _date = value;
+                _milestone.Date = value;
                 OnPropertyChanged("Date");
             }
             get
             {
-                return _date;
+                return _milestone.Date;
             }
         }
 
