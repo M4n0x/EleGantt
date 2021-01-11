@@ -1,14 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace EleGantt.core.models
 {
+    /// <summary>
+    /// This class is used to represent a project
+    /// It contains all the tasks and the milestones
+    /// </summary>
     [Serializable]
     class GanttModel
     {
         public string Name;
-        public string UUID;
+        public string UUID; // in case we have models with same names
         public ObservableCollection<GanttTaskModel> Tasks;
         public ObservableCollection<MilestoneModel> Milestones;
         public GanttModel() { }

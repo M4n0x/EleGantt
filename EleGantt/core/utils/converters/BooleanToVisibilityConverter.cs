@@ -5,6 +5,9 @@ using System.Windows.Data;
 
 namespace EleGantt.core.utils.converters
 {
+    /// <summary>
+    /// Utility class is used to convert Boolean to Int, convertBack is not supported !
+    /// </summary>
     [ValueConversion(typeof(bool), typeof(Visibility))]
     class BooleanToVisibilityConverter : IValueConverter
     {

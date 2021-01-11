@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
-namespace EleGantt
+namespace EleGantt.core.views
 {
     /// <summary>
     /// Logique d'interaction pour MainWindow.xaml
@@ -17,7 +17,7 @@ namespace EleGantt
         private readonly PaletteHelper _paletteHelper = new PaletteHelper();
         public MainWindow()
         {
-            viewModel = new GanttViewModel(); // TODO load model in the view direct 
+            viewModel = new GanttViewModel();
 
             viewModel.ClosingRequest += delegate { Close(); };
 
@@ -27,6 +27,9 @@ namespace EleGantt
             ApplyCurrentTheme();
         }
 
+        /// <summary>
+        /// This function is used to apply the theme on the app, the parameter theme is retrieve through user's app's settings 
+        /// </summary>
         private void ApplyCurrentTheme()
         {
             ITheme theme = _paletteHelper.GetTheme();
@@ -35,19 +38,30 @@ namespace EleGantt
             _paletteHelper.SetTheme(theme);
         }
         
+        /// <summary>
+        /// This function is used to apply function directly when an inputbox is showed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void inputTask_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var input = sender as TextBox;
             if (input.Visibility == Visibility.Visible)
             {
-                Action focusAction = () => input.Focus(); //delay focus action cause mainwindows can be busy
+                Action focusAction = () => input.Focus(); // delay focus action cause mainwindows can be busy
                 Dispatcher.BeginInvoke(focusAction, DispatcherPriority.ApplicationIdle);
             }
         }
 
+        /// <summary>
+        /// Apply theme on menu click
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyCurrentTheme();
         }
+
     }
 }

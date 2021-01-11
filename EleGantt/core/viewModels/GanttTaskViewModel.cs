@@ -5,6 +5,10 @@ using EleGantt.core.models;
 
 namespace EleGantt.core.viewModels
 {
+
+    /// <summary>
+    /// This viewModel is used to hold task'clas
+    /// </summary>
     internal class GanttTaskViewModel : INotifyPropertyChanged
     {
         private GanttTaskModel _task;
@@ -82,9 +86,11 @@ namespace EleGantt.core.viewModels
 
         #endregion
 
-
         #region COMMANDS 
-
+        
+        /// <summary>
+        /// This command is used to enable the edition of this task
+        /// </summary>
         private RelayCommand _enableEditionCmd;
         public ICommand EnableEditionCmd
         {
@@ -92,21 +98,23 @@ namespace EleGantt.core.viewModels
             {
                 return _enableEditionCmd ?? (_enableEditionCmd = new RelayCommand(x =>
                 {
-                    if (!IsEdition) // to not fired OnPropertyChange
+                    if (!IsEdition) // avoid firing unncessary OnPropertyChange if it's already in edit mode
                         IsEdition = true;
                 }));
             }
         }
 
+        /// <summary>
+        /// This command is used to disable edition of the task 
+        /// </summary>
         private RelayCommand _disableEditionCmd;
-
         public ICommand DisableEditionCmd
         {
             get
             {
                 return _disableEditionCmd ?? (_disableEditionCmd = new RelayCommand(x =>
                 {
-                    if (IsEdition) // to not fired OnPropertyChange
+                    if (IsEdition) // avoid firing unncessary OnPropertyChange if it's not in edit mode 
                         IsEdition = false;
                 }));
             }
