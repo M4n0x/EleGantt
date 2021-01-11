@@ -91,8 +91,11 @@
                 </ListView.InputBindings>
             </ListView>
 
-            <controls1:UniformGrid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Rows="{Binding Tasks.Count}">
-                <Border Background="AliceBlue" Grid.ColumnSpan="2">
+            <controls1:UniformGrid Grid.Row="1" Grid.Column="1" Rows="{Binding Tasks.Count}">
+                <GridSplitter>
+                    
+                </GridSplitter>
+                <Border Background="AliceBlue">
                     <TextBlock Text="1"/>
                 </Border>
                 <Border Background="Cornsilk">
@@ -101,7 +104,7 @@
                 <Border Background="DarkSalmon">
                     <TextBlock Text="3"/>
                 </Border>
-                <Border Background="Gainsboro" Grid.RowSpan="2">
+                <Border Background="Gainsboro">
                     <TextBlock Text="4"/>
                 </Border>
                 <Border Background="LightBlue">
