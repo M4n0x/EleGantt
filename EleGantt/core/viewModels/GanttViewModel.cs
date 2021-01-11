@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
+using System.Windows.Controls;
 
 namespace EleGantt.core.viewModels
 {
@@ -50,6 +51,8 @@ namespace EleGantt.core.viewModels
             // this allow to track modifications on project (this is basic, should be improved)
             _TaskList.CollectionChanged += (sender, e) => { Saved = false; }; 
             _MilestoneList.CollectionChanged += (sender, e) => { Saved = false; };
+
+            UpdateDuration();
 
             OnPropertyChanged(null); //update all fields
 
@@ -117,7 +120,6 @@ namespace EleGantt.core.viewModels
             {
                 _MilestoneList = value;
                 OnPropertyChanged("Milestones");
-                UpdateDuration();
             }
         }
 
@@ -128,6 +130,17 @@ namespace EleGantt.core.viewModels
             {
                 _project.Start = value;
                 OnPropertyChanged("Start");
+                UpdateDuration();
+            }
+        }
+
+        public DateTime End
+        {
+            get { return _project.End; }
+            set
+            {
+                _project.End = value;
+                OnPropertyChanged("End");
                 UpdateDuration();
             }
         }
@@ -151,15 +164,6 @@ namespace EleGantt.core.viewModels
             }
         }
 
-        public DateTime End
-        {
-            get { return _project.End; }
-            set
-            {
-                _project.End = value;
-                OnPropertyChanged("End");
-            }
-        }
 
         public void AddTask(GanttTaskModel task)
         {

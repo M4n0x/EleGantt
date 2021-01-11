@@ -4,6 +4,8 @@ using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Threading;
 
 namespace EleGantt.core.views
@@ -25,6 +27,12 @@ namespace EleGantt.core.views
             InitializeComponent();
 
             ApplyCurrentTheme();
+
+            viewModel.PropertyChanged += (sender,args) =>
+            {
+                if (args.PropertyName.Equals("Start") || args.PropertyName.Equals("End"))
+                    AdjustTimeline();
+            };
         }
 
         /// <summary>
@@ -37,13 +45,56 @@ namespace EleGantt.core.views
             theme.SetBaseTheme(baseTheme);
             _paletteHelper.SetTheme(theme);
         }
-        
+
+        private void AdjustTimeline()
+        {
+            DayGrid.Children.Clear();
+            MonthGrid.Children.Clear();
+
+            int currentMonthDays = 0, index = 0;
+            DateTime currentDay = viewModel.Start;
+            DateTime end = viewModel.End;
+            string currentMonth = currentDay.ToString("MMMM");
+
+            while (currentDay <= end) {
+                DayGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                MonthGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                //create "day" textbox
+                TextBlock box = new TextBlock() { Text = currentDay.Day.ToString() };
+                Grid.SetColumn(box, index++);
+                DayGrid.Children.Add(box);
+                currentMonthDays++;
+
+                //analyse - are we on the same month than before ?
+                String month = currentDay.ToString("MMMM");
+                if (month != currentMonth)
+                {
+                    AddMonth(currentMonth, index - currentMonthDays, currentMonthDays);
+                    currentMonthDays = 0;
+                    currentMonth = month;
+                }
+                currentDay = currentDay.AddDays(1);
+            }
+            //add last month
+            AddMonth(currentMonth, index - currentMonthDays, currentMonthDays);
+        }
+
+        private void AddMonth(String month, int start, int duration)
+        {
+            //create "month" textbox
+            TextBlock monthBox = new TextBlock { Text = month };
+            monthBox.HorizontalAlignment = HorizontalAlignment.Center;
+            Grid.SetColumnSpan(monthBox, duration);
+            Grid.SetColumn(monthBox, start);
+            MonthGrid.Children.Add(monthBox);
+        }
+
         /// <summary>
         /// This function is used to apply function directly when an inputbox is showed
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void inputTask_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void InputTask_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var input = sender as TextBox;
             if (input.Visibility == Visibility.Visible)
@@ -63,7 +114,7 @@ namespace EleGantt.core.views
             ApplyCurrentTheme();
         }
 
-        private void sideListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SideListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }

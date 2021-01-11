@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         Title="{Binding AppName}" Height="450" Width="800"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls" xmlns:controls1="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
+        xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls" xmlns:controls1="http://schemas.microsoft.com/netfx/2009/xaml/presentation" xmlns:math="http://hexinnovation.com/math"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -23,6 +23,7 @@
 
     <Window.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
+        <math:MathConverter x:Key="math" />
     </Window.Resources>
 
     <Window.InputBindings>
@@ -55,11 +56,11 @@
                           dd:DragDrop.IsDropTarget="True" 
                           SelectedItem="{Binding SelectedTask}" 
                           HorizontalContentAlignment="Stretch" 
-                          VerticalContentAlignment="Stretch" SelectionChanged="sideListView_SelectionChanged">
+                          VerticalContentAlignment="Stretch" SelectionChanged="SideListView_SelectionChanged">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
-                            <TextBox x:Name="inputTask" Text="{Binding Name}" IsVisibleChanged="inputTask_IsVisibleChanged" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}}" FontWeight="Bold" HorizontalAlignment="Stretch">
+                            <TextBox x:Name="inputTask" Text="{Binding Name}" IsVisibleChanged="InputTask_IsVisibleChanged" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}}" FontWeight="Bold" HorizontalAlignment="Stretch">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="LostFocus">
                                         <i:InvokeCommandAction Command="{Binding DisableEditionCmd}" />
@@ -91,6 +92,23 @@
                 </ListView.InputBindings>
             </ListView>
 
+            <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Grid>
+                        <StackPanel HorizontalAlignment="Left" Grid.Row="0">
+                            <Label HorizontalAlignment="Stretch">Start</Label>
+                            <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding Start}"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Right" Grid.Row="0">
+                            <Label HorizontalAlignment="Stretch">End</Label>
+                            <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding End}" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid Name="MonthGrid" Width="{Binding Duration, Converter={StaticResource math}, ConverterParameter=x*20}"/>
+                    <Grid Name="DayGrid" Width="{Binding Duration, Converter={StaticResource math}, ConverterParameter=x*20}"/>
+                </StackPanel>
+            </ScrollViewer>
+
             <ScrollViewer Grid.Row="1" Grid.Column="1">
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ShowGridLines="True">
                     <ItemsControl ItemsSource="{Binding Tasks}">
@@ -98,11 +116,6 @@
                             <DataTemplate>
                                 <controls1:UniformGrid Columns="{Binding DataContext.Duration, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
                                     <TextBlock Text="{Binding Name}"/>
-                                    <GridSplitter Grid.Column="3"
-                                      HorizontalAlignment="Left"
-                                      VerticalAlignment="Stretch"
-                                      ShowsPreview="True"
-                                      Width="1" />
                                 </controls1:UniformGrid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -127,15 +140,6 @@
             <Button x:Name="btnAdd" Margin="10,10,10,10" Grid.Row="2" Width="75" HorizontalAlignment="Right" Command="{Binding AddTaskCmd}">
                 <materialDesign:PackIcon Kind="Add" Width="15" Height="15"  />
             </Button>
-
-            <StackPanel Grid.Column="1" HorizontalAlignment="Left">
-                <Label HorizontalAlignment="Stretch">Start</Label>
-                <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding Start}"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                <Label HorizontalAlignment="Stretch">End</Label>
-                <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding End}" />
-            </StackPanel>
         </Grid>
 
         <Grid Grid.Column="0">
