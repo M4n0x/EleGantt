@@ -63,5 +63,9 @@ namespace EleGantt.core.views
             ApplyCurrentTheme();
         }
 
+        private void sideListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

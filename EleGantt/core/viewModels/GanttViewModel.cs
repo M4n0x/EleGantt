@@ -20,6 +20,7 @@ namespace EleGantt.core.viewModels
         private ObservableCollection<MilestoneViewModel> _MilestoneList;
         private GanttModel _project;
         private GanttTaskViewModel _selectedTask;
+        private int _duration;
         private bool _saved = true; // allow to know if there is pending modifications
         private string _filePath; // save the path of the current loaded project
 
@@ -116,6 +117,47 @@ namespace EleGantt.core.viewModels
             {
                 _MilestoneList = value;
                 OnPropertyChanged("Milestones");
+                UpdateDuration();
+            }
+        }
+
+        public DateTime Start
+        {
+            get { return _project.Start; }
+            set
+            {
+                _project.Start = value;
+                OnPropertyChanged("Start");
+                UpdateDuration();
+            }
+        }
+
+        public int Duration
+        {
+            get { return _duration; }
+            set
+            {
+                _duration = value;
+                OnPropertyChanged("Duration");
+            }
+        }
+
+        private void UpdateDuration()
+        {
+            int updated = (_project.End - _project.Start).Days;
+            if(updated != _duration)
+            {
+                Duration = updated;
+            }
+        }
+
+        public DateTime End
+        {
+            get { return _project.End; }
+            set
+            {
+                _project.End = value;
+                OnPropertyChanged("End");
             }
         }
 

@@ -6,6 +6,7 @@
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:converters="clr-namespace:EleGantt.core.utils.converters"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="{Binding AppName}" Height="450" Width="800"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -31,7 +32,7 @@
     </Window.InputBindings>
 
     <Grid>
-        
+
         <Grid.RowDefinitions>
             <RowDefinition Height="30px"/>
             <RowDefinition Height="5*"/>
@@ -54,7 +55,7 @@
                           dd:DragDrop.IsDropTarget="True" 
                           SelectedItem="{Binding SelectedTask}" 
                           HorizontalContentAlignment="Stretch" 
-                          VerticalContentAlignment="Stretch">
+                          VerticalContentAlignment="Stretch" SelectionChanged="sideListView_SelectionChanged">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -90,32 +91,24 @@
                 </ListView.InputBindings>
             </ListView>
 
-            <controls1:UniformGrid Grid.Row="1" Grid.Column="1" Rows="{Binding Tasks.Count}">
-                <GridSplitter>
-                    
-                </GridSplitter>
-                <Border Background="AliceBlue">
-                    <TextBlock Text="1"/>
-                </Border>
-                <Border Background="Cornsilk">
-                    <TextBlock Text="2"/>
-                </Border>
-                <Border Background="DarkSalmon">
-                    <TextBlock Text="3"/>
-                </Border>
-                <Border Background="Gainsboro">
-                    <TextBlock Text="4"/>
-                </Border>
-                <Border Background="LightBlue">
-                    <TextBlock Text="5"/>
-                </Border>
-                <Border Background="MediumAquamarine">
-                    <TextBlock Text="6"/>
-                </Border>
-                <Border Background="MistyRose">
-                    <TextBlock Text="7"/>
-                </Border>
-            </controls1:UniformGrid>
+            <ScrollViewer Grid.Row="1" Grid.Column="1">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ShowGridLines="True">
+                    <ItemsControl ItemsSource="{Binding Tasks}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <controls1:UniformGrid Columns="{Binding DataContext.Duration, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+                                    <TextBlock Text="{Binding Name}"/>
+                                    <GridSplitter Grid.Column="3"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Stretch"
+                                      ShowsPreview="True"
+                                      Width="1" />
+                                </controls1:UniformGrid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </ScrollViewer>
 
             <GridSplitter Grid.Column="1"
               HorizontalAlignment="Left"
@@ -134,7 +127,15 @@
             <Button x:Name="btnAdd" Margin="10,10,10,10" Grid.Row="2" Width="75" HorizontalAlignment="Right" Command="{Binding AddTaskCmd}">
                 <materialDesign:PackIcon Kind="Add" Width="15" Height="15"  />
             </Button>
-            
+
+            <StackPanel Grid.Column="1" HorizontalAlignment="Left">
+                <Label HorizontalAlignment="Stretch">Start</Label>
+                <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding Start}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                <Label HorizontalAlignment="Stretch">End</Label>
+                <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding End}" />
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Column="0">
