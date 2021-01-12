@@ -97,12 +97,8 @@
                 </ListView.InputBindings>
             </ListView>
 
-                <DataGrid Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" CanUserResizeColumns="False" CanUserResizeRows="False" AutoGenerateColumns="False" Name="Timeline" ItemsSource="{Binding Tasks}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="{Binding Duration, Converter={StaticResource math}, ConverterParameter=x*20}">
-                    <DataGrid.RowDetailsTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Text}" Margin="10" />
-                        </DataTemplate>
-                    </DataGrid.RowDetailsTemplate>
+                <DataGrid Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" CanUserResizeColumns="False" CanUserResizeRows="False" AutoGenerateColumns="False" Name="Timeline" ItemsSource="{Binding Tasks}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+
                 </DataGrid>
 
                 <GridSplitter Grid.Column="1"
