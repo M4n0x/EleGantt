@@ -55,18 +55,25 @@ namespace EleGantt.core.views
             string currentMonth = currentDay.ToString("MMMM");
 
             while (currentDay <= end) {
-                Timeline.Columns.Add(new MaterialDesignThemes.Wpf.DataGridTextColumn
+
+                Timeline.ColumnDefinitions.Add(new ColumnDefinition()
                 {
-                    Header = currentDay.Day.ToString()
-                });
+                    Width = new GridLength(50),
+                }) ;
                 //create "day" textbox
+                TextBlock box = new TextBlock() { Text = currentDay.Day.ToString() };
+                box.HorizontalAlignment = HorizontalAlignment.Center;
+                box.VerticalAlignment = VerticalAlignment.Center;
+                Grid.SetColumn(box, index++);
+                Grid.SetRow(box, 1);
+                Timeline.Children.Add(box);
                 currentMonthDays++;
 
                 //analyse - are we on the same month than before ?
                 String month = currentDay.ToString("MMMM");
                 if (month != currentMonth)
                 {
-                    //AddMonth(currentMonth, index - currentMonthDays, currentMonthDays);
+                    AddMonth(currentMonth, index - currentMonthDays, currentMonthDays);
                     currentMonthDays = 0;
                     currentMonth = month;
                 }
@@ -79,12 +86,12 @@ namespace EleGantt.core.views
         private void AddMonth(String month, int start, int duration)
         {
             //create "month" textbox
-            /*TextBlock monthBox = new TextBlock { Text = month };
+            TextBlock monthBox = new TextBlock { Text = month };
             monthBox.HorizontalAlignment = HorizontalAlignment.Center;
             Grid.SetColumnSpan(monthBox, duration);
             Grid.SetColumn(monthBox, start);
             Grid.SetRow(monthBox, 0);
-            Timeline.Children.Add(monthBox);*/
+            Timeline.Children.Add(monthBox);
         }
 
         /// <summary>
