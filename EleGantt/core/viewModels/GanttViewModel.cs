@@ -12,6 +12,7 @@ using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Controls;
+using EleGantt.core.views;
 
 namespace EleGantt.core.viewModels
 {
@@ -167,11 +168,13 @@ namespace EleGantt.core.viewModels
 
         public void AddTask(GanttTaskModel task)
         {
-            AddTask(new GanttTaskViewModel(task));
+            AddTask(task);
         }
 
         public void AddTask(GanttTaskViewModel task)
         {
+            //HERE DIALOG TODO TASK DIALOG TODO HERE MAXIME
+            TaskDialog.CreateTaskWindowModal(task);
             _TaskList.Add(task);
             OnPropertyChanged("Tasks");
         }
