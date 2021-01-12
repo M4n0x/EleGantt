@@ -28,11 +28,7 @@ namespace EleGantt.core.views
 
             ApplyCurrentTheme();
 
-            viewModel.PropertyChanged += (sender,args) =>
-            {
-                if (args.PropertyName.Equals("Start") || args.PropertyName.Equals("End"))
-                    AdjustTimeline();
-            };
+            AdjustTimeline();
         }
 
         /// <summary>
@@ -48,28 +44,29 @@ namespace EleGantt.core.views
 
         private void AdjustTimeline()
         {
-            DayGrid.Children.Clear();
-            MonthGrid.Children.Clear();
+            if (!StartDate.SelectedDate.HasValue || !EndDate.SelectedDate.HasValue)
+                return;
 
             int currentMonthDays = 0, index = 0;
-            DateTime currentDay = viewModel.Start;
-            DateTime end = viewModel.End;
+
+            DateTime currentDay = StartDate.SelectedDate.Value;
+            DateTime end = EndDate.SelectedDate.Value;
+
             string currentMonth = currentDay.ToString("MMMM");
 
             while (currentDay <= end) {
-                DayGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                MonthGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                Timeline.Columns.Add(new MaterialDesignThemes.Wpf.DataGridTextColumn
+                {
+                    Header = currentDay.Day.ToString()
+                });
                 //create "day" textbox
-                TextBlock box = new TextBlock() { Text = currentDay.Day.ToString() };
-                Grid.SetColumn(box, index++);
-                DayGrid.Children.Add(box);
                 currentMonthDays++;
 
                 //analyse - are we on the same month than before ?
                 String month = currentDay.ToString("MMMM");
                 if (month != currentMonth)
                 {
-                    AddMonth(currentMonth, index - currentMonthDays, currentMonthDays);
+                    //AddMonth(currentMonth, index - currentMonthDays, currentMonthDays);
                     currentMonthDays = 0;
                     currentMonth = month;
                 }
@@ -82,11 +79,12 @@ namespace EleGantt.core.views
         private void AddMonth(String month, int start, int duration)
         {
             //create "month" textbox
-            TextBlock monthBox = new TextBlock { Text = month };
+            /*TextBlock monthBox = new TextBlock { Text = month };
             monthBox.HorizontalAlignment = HorizontalAlignment.Center;
             Grid.SetColumnSpan(monthBox, duration);
             Grid.SetColumn(monthBox, start);
-            MonthGrid.Children.Add(monthBox);
+            Grid.SetRow(monthBox, 0);
+            Timeline.Children.Add(monthBox);*/
         }
 
         /// <summary>
@@ -114,7 +112,7 @@ namespace EleGantt.core.views
             ApplyCurrentTheme();
         }
 
-        private void SideListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SeletedDateChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }

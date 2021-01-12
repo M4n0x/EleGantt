@@ -17,12 +17,23 @@ namespace EleGantt.core.viewModels
 
         public GanttTaskViewModel(GanttTaskModel task)
         {
-            this._task = task;
+            _task = task;
         }
 
         public GanttTaskModel GanttTaskModel
         {
             get { return _task; }
+        }
+
+
+        public int Length
+        {
+            set
+            {
+                //
+                OnPropertyChanged("Length");
+            }
+            get { return 3; }
         }
 
         public bool IsSelected

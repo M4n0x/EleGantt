@@ -20,7 +20,6 @@
         FontFamily="{DynamicResource MaterialDesignFont}"
         MinHeight="300px"
         MinWidth="500px">
-
     <Window.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
         <math:MathConverter x:Key="math" />
@@ -41,22 +40,28 @@
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="20*" MinHeight="40px"/>
-                <RowDefinition Height="85*" MinHeight="100px"/>
-                <RowDefinition Height="20*" MinHeight="60px"/>
+                <RowDefinition Height="80px"/>
+                <RowDefinition Height="250*" MinHeight="100px"/>
+                <RowDefinition Height="60px"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="200px"/>
+                <ColumnDefinition Width="2*" MinWidth="220px"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBox  Grid.Row="0" TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Project Name'}" VerticalAlignment="Top" Padding="0 2px" Margin="10px 10px" FontWeight="Bold"/>
+            <StackPanel Grid.Row="0" Margin="10,0,10,0">
+                <TextBox TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Project Name'}" VerticalAlignment="Top" Padding="0 2px" Margin="0,5,0,10" FontWeight="Bold" Height="33" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <DatePicker Name="StartDate" Width="90" SelectedDate="{Binding Start}" SelectedDateChanged="SeletedDateChanged"/>
+                    <DatePicker Name="EndDate" Width="90" SelectedDate="{Binding End}" SelectedDateChanged="SeletedDateChanged" Margin="10,0"/>
+                </StackPanel>
+            </StackPanel>
             <ListView x:Name="sideListView" Margin="10,10,10,10" Grid.Row="1" ItemsSource="{Binding Tasks}"  
                           dd:DragDrop.IsDragSource="True" 
                           dd:DragDrop.IsDropTarget="True" 
                           SelectedItem="{Binding SelectedTask}" 
                           HorizontalContentAlignment="Stretch" 
-                          VerticalContentAlignment="Stretch" SelectionChanged="SideListView_SelectionChanged">
+                          VerticalContentAlignment="Stretch">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -92,38 +97,15 @@
                 </ListView.InputBindings>
             </ListView>
 
-            <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <Grid>
-                        <StackPanel HorizontalAlignment="Left" Grid.Row="0">
-                            <Label HorizontalAlignment="Stretch">Start</Label>
-                            <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding Start}"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Right" Grid.Row="0">
-                            <Label HorizontalAlignment="Stretch">End</Label>
-                            <DatePicker HorizontalAlignment="Stretch" SelectedDate="{Binding End}" />
-                        </StackPanel>
-                    </Grid>
-                    <Grid Name="MonthGrid" Width="{Binding Duration, Converter={StaticResource math}, ConverterParameter=x*20}"/>
-                    <Grid Name="DayGrid" Width="{Binding Duration, Converter={StaticResource math}, ConverterParameter=x*20}"/>
-                </StackPanel>
-            </ScrollViewer>
+                <DataGrid Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" CanUserResizeColumns="False" CanUserResizeRows="False" AutoGenerateColumns="False" Name="Timeline" ItemsSource="{Binding Tasks}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="{Binding Duration, Converter={StaticResource math}, ConverterParameter=x*20}">
+                    <DataGrid.RowDetailsTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}" Margin="10" />
+                        </DataTemplate>
+                    </DataGrid.RowDetailsTemplate>
+                </DataGrid>
 
-            <ScrollViewer Grid.Row="1" Grid.Column="1">
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ShowGridLines="True">
-                    <ItemsControl ItemsSource="{Binding Tasks}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <controls1:UniformGrid Columns="{Binding DataContext.Duration, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
-                                    <TextBlock Text="{Binding Name}"/>
-                                </controls1:UniformGrid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Grid>
-            </ScrollViewer>
-
-            <GridSplitter Grid.Column="1"
+                <GridSplitter Grid.Column="1"
               HorizontalAlignment="Left"
               VerticalAlignment="Stretch"
               ShowsPreview="True"
@@ -131,13 +113,13 @@
               Grid.RowSpan="3"
               />
 
-            <Button x:Name="btnDelete" HorizontalAlignment="Left" Margin="10,10,0,10" Grid.Row="2" Width="75" 
+            <Button x:Name="btnDelete" HorizontalAlignment="Left" Margin="10,10,0,15" Grid.Row="2" Width="75" 
                     Style="{StaticResource MaterialDesignOutlinedButton}" 
                     CommandParameter="{Binding ElementName=sideListView, Path=SelectedItems}"
                     Command="{Binding RemoveSelectedTasksCmd}">
                 <materialDesign:PackIcon Kind="Delete" Width="15" Height="15"/>
             </Button>
-            <Button x:Name="btnAdd" Margin="10,10,10,10" Grid.Row="2" Width="75" HorizontalAlignment="Right" Command="{Binding AddTaskCmd}">
+            <Button x:Name="btnAdd" Margin="0,10,10,15" Grid.Row="2" Width="75" HorizontalAlignment="Right" Command="{Binding AddTaskCmd}">
                 <materialDesign:PackIcon Kind="Add" Width="15" Height="15"  />
             </Button>
         </Grid>
