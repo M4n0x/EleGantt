@@ -28,12 +28,7 @@ namespace EleGantt.core.viewModels
 
         public int Length
         {
-            set
-            {
-                //
-                OnPropertyChanged("Length");
-            }
-            get { return 3; }
+            get { return (_task.DateEnd - _task.DateStart).Days; }
         }
 
         public bool IsSelected
@@ -71,6 +66,7 @@ namespace EleGantt.core.viewModels
             {
                 _task.DateStart = value;
                 OnPropertyChanged("DateStart");
+                OnPropertyChanged("Length");
             }
             get { return _task.DateEnd; }
         }
@@ -80,6 +76,7 @@ namespace EleGantt.core.viewModels
             {
                 _task.DateEnd = value;
                 OnPropertyChanged("DateEnd");
+                OnPropertyChanged("Length");
             }
             get { return _task.DateEnd; }
         }
