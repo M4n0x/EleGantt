@@ -7,7 +7,7 @@ namespace EleGantt.core.models
     /// This model is used to represent a Task
     /// </summary>
     [Serializable]
-    class GanttTaskModel
+    public class GanttTaskModel
     {
         public string Name;
         public DateTime DateStart;

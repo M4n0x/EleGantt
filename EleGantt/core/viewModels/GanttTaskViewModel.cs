@@ -9,7 +9,7 @@ namespace EleGantt.core.viewModels
     /// <summary>
     /// This viewModel is used to hold task'clas
     /// </summary>
-    internal class GanttTaskViewModel : INotifyPropertyChanged
+    public class GanttTaskViewModel : INotifyPropertyChanged
     {
         private GanttTaskModel _task;
         private bool _isSelected;
@@ -68,7 +68,7 @@ namespace EleGantt.core.viewModels
                 OnPropertyChanged("DateStart");
                 OnPropertyChanged("Length");
             }
-            get { return _task.DateEnd; }
+            get { return _task.DateStart; }
         }
         public DateTime DateEnd
         {
