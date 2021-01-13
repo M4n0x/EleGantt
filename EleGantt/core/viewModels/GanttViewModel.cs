@@ -218,6 +218,7 @@ namespace EleGantt.core.viewModels
         {
             _MilestoneList.Add(milestone);
             OnPropertyChanged("Milestones");
+            milestone.ShowEditForm();
         }
 
         public void RemoveMilestone(MilestoneViewModel milestone)
@@ -279,12 +280,24 @@ namespace EleGantt.core.viewModels
             {
                 return _addTaskCmd ?? (_addTaskCmd = new RelayCommand(x => 
                 {
-                    //TODO Adjust datestart date related to the project, same for the end date 
                     var item = new GanttTaskViewModel(new GanttTaskModel { Name = "New Task", DateStart = DateTime.Now, DateEnd = DateTime.Now.AddDays(2) });
                     AddTask(item);
                     SelectedTask = item;
                 }));
             } 
+        }
+
+        private RelayCommand _addMilestoneCmd;
+        public ICommand AddMilestoneCmd
+        {
+            get
+            {
+                return _addMilestoneCmd ?? (_addMilestoneCmd = new RelayCommand(x =>
+                {
+                    var milestone = new MilestoneViewModel(new MilestoneModel { Name="Milestone", Date=Start });
+                    AddMilestone(milestone);
+                }));
+            }
         }
 
         private RelayCommand _removeSelectedTasksCmd;

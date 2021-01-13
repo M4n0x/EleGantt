@@ -31,14 +31,6 @@ namespace EleGantt.core.views
             ApplyCurrentTheme();
 
             AdjustTimeline();
-
-            for(int i=0; i<50; i+=10)
-            {
-                var milestone = new MilestoneModel();
-                milestone.Date = DateTime.Now.AddDays(i);
-                milestone.Name = $"Milestone {i}";
-                viewModel.AddMilestone(milestone);
-            }
         }
 
         /// <summary>
