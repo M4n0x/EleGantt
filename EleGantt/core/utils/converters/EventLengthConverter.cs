@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace EleGantt.core.utils.converters
 {
-    //see https://stackoverflow.com/questions/37949599/how-to-dynamically-draw-a-timeline-in-wpfhttps://stackoverflow.com/questions/37949599/how-to-dynamically-draw-a-timeline-in-wpf
+    //see https://stackoverflow.com/questions/37949599/how-to-dynamically-draw-a-timeline-in-wpf
     public class EventLengthConverter : IMultiValueConverter
     {
 
@@ -21,10 +21,10 @@ namespace EleGantt.core.utils.converters
              * public DateTime DateEnd;
              * the dates are important here
              */
-            TimeSpan timelineDuration = (TimeSpan)values[0];
-            TimeSpan relativeTime = (TimeSpan)values[1];
+            DateTime startProjectTime = (DateTime)values[0];
+            DateTime startTaskTime = (DateTime)values[1];
             double containerWidth = (double)values[2];
-            double factor = relativeTime.TotalSeconds / timelineDuration.TotalSeconds;
+            double factor = (startTaskTime - startProjectTime).Days;
             double rval = factor * containerWidth;
 
             if (targetType == typeof(Thickness))

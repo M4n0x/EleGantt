@@ -25,6 +25,8 @@ namespace EleGantt.core.viewModels
         private int _duration;
         private bool _saved = true; // allow to know if there is pending modifications
         private string _filePath; // save the path of the current loaded project
+        private double _cellWidth = 50;
+        private double _cellHeight = 30;
 
         public GanttViewModel() : this(new GanttModel("Project Name")) { }
 
@@ -63,6 +65,26 @@ namespace EleGantt.core.viewModels
         public string AppName
         {
             get { return "EleGantt - " + (_saved ? _project.Name : _project.Name + " *"); }
+        }
+
+        public double CellWidth
+        {
+            get { return _cellWidth;  }
+            set 
+            {
+                _cellWidth = value;
+                OnPropertyChanged("CellWidth");
+            }
+        }
+
+        public double CellHeight
+        {
+            get { return _cellHeight; }
+            set
+            {
+                _cellHeight = value;
+                OnPropertyChanged("CellHeight");
+            }
         }
 
         public bool IsDark
