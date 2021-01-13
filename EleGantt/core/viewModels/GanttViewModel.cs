@@ -368,7 +368,6 @@ namespace EleGantt.core.viewModels
                             return; // no path has been provided so we do nothing
                         }
                     }
-
                     File.WriteAllText(_filePath, JsonConvert.SerializeObject(_project));
                     Saved = true;
                 }));

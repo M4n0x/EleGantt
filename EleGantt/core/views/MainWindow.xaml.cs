@@ -258,6 +258,8 @@ namespace EleGantt.core.views
         private BitmapFrame PrepareTimelineScreen()
         {
             MainScrollTimeline.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+            MainScrollTimeline.ScrollToHome();
+            
             MainScrollTimeline.UpdateLayout();
             var frame = SaveUsingEncoder(GridTimeline);
             MainScrollTimeline.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
