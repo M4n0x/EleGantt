@@ -128,23 +128,54 @@ namespace EleGantt.core.views
         private void ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
 
-            return;
-            // Get the border of the listview (first child of a listview)
-            Decorator border = VisualTreeHelper.GetChild(SideListView, 0) as Decorator;
+            if (e.VerticalChange == 0) { return; }
 
             // Get scrollviewer
-            ScrollViewer scrollViewer = border.Child as ScrollViewer;
+            ScrollViewer scrollViewer = GetDescendantByType(SideListView, typeof(ScrollViewer)) as ScrollViewer;
+
 
             if (sender == TimelineScrollView)
             {
-                scrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
-                scrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
+                if (TimelineScrollView.ScrollableHeight != 0) { 
+                    double ratio = e.VerticalOffset / TimelineScrollView.ScrollableHeight;
+                    scrollViewer.ScrollToVerticalOffset(scrollViewer.ScrollableHeight * ratio);
+                }
             }
             else
             {
-                TimelineScrollView.ScrollToVerticalOffset(e.VerticalOffset);
-                TimelineScrollView.ScrollToHorizontalOffset(e.HorizontalOffset);
+                if (scrollViewer.ScrollableHeight != 0)
+                {
+                    double ratio = e.VerticalOffset / scrollViewer.ScrollableHeight;
+                    Trace.WriteLine("ratio 2 : " + ratio);
+                    TimelineScrollView.ScrollToVerticalOffset(TimelineScrollView.ScrollableHeight * ratio);
+                }
             }
+        }
+        public static Visual GetDescendantByType(Visual element, Type type)
+        {
+            if (element == null)
+            {
+                return null;
+            }
+            if (element.GetType() == type)
+            {
+                return element;
+            }
+            Visual foundElement = null;
+            if (element is FrameworkElement)
+            {
+                (element as FrameworkElement).ApplyTemplate();
+            }
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(element); i++)
+            {
+                Visual visual = VisualTreeHelper.GetChild(element, i) as Visual;
+                foundElement = GetDescendantByType(visual, type);
+                if (foundElement != null)
+                {
+                    break;
+                }
+            }
+            return foundElement;
         }
     }
 }

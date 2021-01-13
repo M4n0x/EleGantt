@@ -70,13 +70,14 @@
                     <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" SelectedDate="{Binding End}" SelectedDateChanged="SeletedDateChanged"/>
                 </Grid>
             </StackPanel>
-            <ListView x:Name="SideListView" Margin="10,10,10,10" Grid.Row="1" ItemsSource="{Binding Tasks}"  
+            <ListView x:Name="SideListView" Margin="10,10,10,0" Grid.Row="1" ItemsSource="{Binding Tasks}"  
                           dd:DragDrop.IsDragSource="True" 
                           dd:DragDrop.IsDropTarget="True" 
                           SelectedItem="{Binding SelectedTask}" 
                           HorizontalContentAlignment="Stretch" 
                           VerticalContentAlignment="Stretch"
-                          ScrollViewer.ScrollChanged="ScrollChanged">
+                      controls1:ScrollViewer.ScrollChanged="ScrollChanged"
+                         >
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -111,22 +112,26 @@
                     <KeyBinding Key="Delete" 
                                     CommandParameter="{Binding ElementName=SideListView, Path=SelectedItems}"
                                     Command="{Binding RemoveSelectedTasksCmd}" />
-                    <KeyBinding Key="F2" 
+                    <KeyBinding Key="F2"
                                     CommandParameter="{Binding ElementName=SideListView, Path=SelectedItems}"
                                     Command="{Binding EditSelectedTasksCmd}" />
                 </ListView.InputBindings>
             </ListView>
 
-            <ScrollViewer Name="TimelineScrollView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Auto" ScrollChanged="ScrollChanged">
-                <StackPanel>
-                    <Grid Name="Timeline" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="40px" />
-                            <RowDefinition Height="40px" />
-                        </Grid.RowDefinitions>
-                    </Grid>
 
-                    <ItemsControl ItemsSource="{Binding Tasks}" Margin="0,27,0,0">
+            <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="80px"/>
+                    <RowDefinition Height="250*"/>
+                </Grid.RowDefinitions>
+                <Grid Name="Timeline" HorizontalAlignment="Stretch" Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40px"/>
+                        <RowDefinition Height="40px"/>
+                    </Grid.RowDefinitions>
+                </Grid>
+                <ScrollViewer Name="TimelineScrollView" Margin="0,27,0,0" HorizontalScrollBarVisibility="Auto" ScrollChanged="ScrollChanged" VerticalAlignment="Stretch" Grid.Row="1">
+                    <ItemsControl ItemsSource="{Binding Tasks}" >
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel>
@@ -136,26 +141,36 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name}" Background="Red" HorizontalAlignment="Left" Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}" >
-                                    <TextBlock.Width >
+                                <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Stretch"  Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}">
+                                    <materialDesign:Card Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline, Converter={StaticResource math}, ConverterParameter=x-2}"
+                                               
+                                               Background="{DynamicResource PrimaryHueDarkBrush}"
+                                               HorizontalAlignment="Left"
+                                               Margin="0,1">
+
+                                        <Label Content="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"/>
+                                    
+                                    </materialDesign:Card>
+                                    <WrapPanel.Width>
                                         <MultiBinding Converter="{StaticResource math}" ConverterParameter="x*y">
                                             <Binding Path="Length" />
                                             <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
                                         </MultiBinding>
-                                    </TextBlock.Width>
-                                    <TextBlock.Margin>
+                                    </WrapPanel.Width>
+                                    <WrapPanel.Margin>
                                         <MultiBinding Converter="{StaticResource mEventLengthConverter}">
                                             <Binding ElementName="Timeline" Path="DataContext.Start"/>
                                             <Binding Path="DateStart"/>
                                             <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
                                         </MultiBinding>
-                                    </TextBlock.Margin>
-                                </TextBlock>
+                                    </WrapPanel.Margin>
+                                </WrapPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </StackPanel>
-            </ScrollViewer>
+                </ScrollViewer>
+            </Grid>
+            
 
             <Button x:Name="btnDelete" HorizontalAlignment="Left" Margin="10,10,0,15" Grid.Row="2" Width="75" 
                     Style="{StaticResource MaterialDesignOutlinedButton}" 
