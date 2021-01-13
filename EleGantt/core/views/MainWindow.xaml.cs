@@ -3,6 +3,7 @@ using EleGantt.core.viewModels;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -19,6 +20,7 @@ namespace EleGantt.core.views
     {
         private GanttViewModel viewModel;
         private readonly PaletteHelper _paletteHelper = new PaletteHelper();
+        private CultureInfo culture = CultureInfo.CurrentCulture;
         public MainWindow()
         {
             viewModel = new GanttViewModel();
@@ -73,6 +75,7 @@ namespace EleGantt.core.views
                 });
 
                 //create "day" textbox
+                //TextBlock box = new TextBlock() { Text = $"{currentDay.Day.ToString()} { culture.DateTimeFormat.GetAbbreviatedDayName(currentDay.DayOfWeek)}" };
                 TextBlock box = new TextBlock() { Text = currentDay.Day.ToString() };
                 box.HorizontalAlignment = HorizontalAlignment.Left;
                 box.VerticalAlignment = VerticalAlignment.Center;

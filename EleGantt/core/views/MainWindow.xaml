@@ -54,7 +54,7 @@
 
             <!-- DIALOGS-->
             <!-- TASK -->
-            <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAwayParameter="True" CloseOnClickAway="True" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+            <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAway="True" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
                 <materialDesign:DialogHost.DialogContentTemplate>
                     <DataTemplate DataType="local:GanttTaskViewModel">
                         <StackPanel Margin="20,20">
@@ -98,7 +98,7 @@
             </materialDesign:DialogHost>
             
             <!-- MILESTONE -->
-            <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAwayParameter="True" CloseOnClickAway="True" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+            <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAway="True" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
                 <materialDesign:DialogHost.DialogContentTemplate>
                     <DataTemplate DataType="local:MilestoneViewModel">
                         <StackPanel Margin="20,20">
