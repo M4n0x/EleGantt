@@ -22,7 +22,7 @@
         WindowState="Maximized"
         MinHeight="300px"
         MinWidth="500px">
-    
+
     <Window.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
         <converters:EventLengthConverter x:Key="mEventLengthConverter"/>
@@ -53,7 +53,8 @@
             </Grid.ColumnDefinitions>
 
             <!-- DIALOGS-->
-            <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAwayParameter="True" CloseOnClickAway="True" Identifier="dialog1" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+            <!-- TASK -->
+            <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAwayParameter="True" CloseOnClickAway="True" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
                 <materialDesign:DialogHost.DialogContentTemplate>
                     <DataTemplate DataType="local:GanttTaskViewModel">
                         <StackPanel Margin="20,20">
@@ -95,8 +96,36 @@
                     </DataTemplate>
                 </materialDesign:DialogHost.DialogContentTemplate>
             </materialDesign:DialogHost>
+            
+            <!-- Mileston -->
+            <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAwayParameter="True" CloseOnClickAway="True" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+                <materialDesign:DialogHost.DialogContentTemplate>
+                    <DataTemplate DataType="local:MilestoneViewModel">
+                        <StackPanel Margin="20,20">
+                            <TextBox Text="{Binding Name}" Margin="5,10" />
 
-            <StackPanel Grid.Row="0" Margin="10,0,10,0">
+                            <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" SelectedDate="{Binding Date}" Focusable="False" DisplayDateStart="{Binding Path=DataContext.Start, ElementName=TaskDialog}" DisplayDateEnd="{Binding Path=DataContext.End, ElementName=TaskDialog}"/>
+
+                            <StackPanel
+                                Margin="5,10"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                                <Button
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    IsDefault="True"
+                                    Content="Accept"
+                                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                                    <Button.CommandParameter>
+                                        <sys:Boolean>True</sys:Boolean>
+                                    </Button.CommandParameter>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </materialDesign:DialogHost.DialogContentTemplate>
+            </materialDesign:DialogHost>
+
+            <StackPanel Grid.Row="0" Margin="10,0,10,0" Height="120px">
                 <TextBox TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Project Name'}" VerticalAlignment="Top" Padding="0 2px" Margin="0,5,0,10" FontWeight="Bold" Height="33" />
                 <Grid HorizontalAlignment="Stretch" >
                     <Grid.ColumnDefinitions>
@@ -121,7 +150,7 @@
                     </DatePicker>
                 </Grid>
             </StackPanel>
-            <ListView x:Name="SideListView" Margin="10,10,10,10" Grid.Row="1" ItemsSource="{Binding Tasks}"  
+            <ListView x:Name="SideListView" Margin="10,0,10,0" Grid.Row="1" ItemsSource="{Binding Tasks}"  
                           dd:DragDrop.IsDragSource="True" 
                           dd:DragDrop.IsDropTarget="True" 
                           SelectedItem="{Binding SelectedTask}" 
@@ -174,10 +203,54 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="40px" />
                             <RowDefinition Height="40px" />
+                            <RowDefinition Height="40px" />
                         </Grid.RowDefinitions>
+
+                        <ItemsControl ItemsSource="{Binding Milestones}" Grid.Row="2">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas>
+
+                                    </Canvas>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderThickness="1" BorderBrush="Black" CornerRadius="10">
+                                        <Border.Margin>
+                                            <MultiBinding Converter="{StaticResource mEventLengthConverter}">
+                                                <Binding ElementName="Timeline" Path="DataContext.Start"/>
+                                                <Binding Path="Date"/>
+                                                <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
+                                            </MultiBinding>
+                                        </Border.Margin>
+
+                                        <Border.InputBindings>
+                                            <MouseBinding MouseAction="LeftDoubleClick" 
+                                                Command="{Binding ShowMilestoneDialog}"
+                                                CommandParameter="{Binding DataContext}"/>
+                                        </Border.InputBindings>
+
+                                        <Border.Style>
+                                            <Style>
+                                                <Setter Property="Border.Background" Value="Gray"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="Border.IsMouseOver" Value="True">
+                                                        <Setter Property="Border.Background" Value="LightGray" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2,0"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Grid>
 
-                    <ItemsControl ItemsSource="{Binding Tasks}" Margin="0,27,0,0">
+
+                    <ItemsControl ItemsSource="{Binding Tasks}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel>
@@ -187,7 +260,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Name="task" Text="{Binding Name}" Background="Red" HorizontalAlignment="Left" Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}" >
+                                <TextBlock Text="{Binding Name}" Background="Green" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center" Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}" >
                                     <TextBlock.Width >
                                         <MultiBinding Converter="{StaticResource math}" ConverterParameter="x*y">
                                             <Binding Path="Length" />
@@ -205,7 +278,7 @@
                                     <TextBlock.InputBindings>
                                         <MouseBinding MouseAction="LeftDoubleClick" 
                                             Command="{Binding ShowTaskDialog}"
-                                            CommandParameter="{Binding ElementName=task,Path=DataContext}"/>
+                                            CommandParameter="{Binding DataContext}"/>
                                     </TextBlock.InputBindings>
                                 </TextBlock>
                             </DataTemplate>

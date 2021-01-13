@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows.Input;
 using EleGantt.core.models;
+using MaterialDesignThemes.Wpf;
 
 namespace EleGantt.core.viewModels
 {
@@ -18,6 +20,11 @@ namespace EleGantt.core.viewModels
             get { return _milestone; }
         }
 
+        public void ShowEditForm()
+        {
+            DialogHost.Show(this, "dialogMilestone");
+        }
+
         public string Name 
         {
             set
@@ -30,6 +37,20 @@ namespace EleGantt.core.viewModels
                 return _milestone.Name;
             }
         }
+        private RelayCommand _showMilestoneDialog;
+        public ICommand ShowMilestoneDialog
+        {
+            get
+            {
+                return _showMilestoneDialog ?? (_showMilestoneDialog = new RelayCommand(x =>
+                {
+                    ShowEditForm();
+                }));
+            }
+        }
+
+
+        
         public DateTime Date
         {
             set

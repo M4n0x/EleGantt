@@ -84,7 +84,7 @@ namespace EleGantt.core.viewModels
 
         public void ShowEditForm()
         {
-            DialogHost.Show(this, "dialog1");
+            DialogHost.Show(this, "dialogTask");
         }
 
         #region INotifyPropertyChanged Members  
@@ -131,6 +131,7 @@ namespace EleGantt.core.viewModels
                 }));
             }
         }
+
 
         /// <summary>
         /// This command is used to disable edition of the task 
