@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace EleGantt.core.views
@@ -62,7 +63,7 @@ namespace EleGantt.core.views
                 }) ;
                 //create "day" textbox
                 TextBlock box = new TextBlock() { Text = currentDay.Day.ToString() };
-                box.HorizontalAlignment = HorizontalAlignment.Center;
+                box.HorizontalAlignment = HorizontalAlignment.Left;
                 box.VerticalAlignment = VerticalAlignment.Center;
                 Grid.SetColumn(box, index++);
                 Grid.SetRow(box, 1);
@@ -121,7 +122,29 @@ namespace EleGantt.core.views
 
         private void SeletedDateChanged(object sender, SelectionChangedEventArgs e)
         {
+            //AdjustTimeline();
+        }
 
+        private void ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+
+            return;
+            // Get the border of the listview (first child of a listview)
+            Decorator border = VisualTreeHelper.GetChild(SideListView, 0) as Decorator;
+
+            // Get scrollviewer
+            ScrollViewer scrollViewer = border.Child as ScrollViewer;
+
+            if (sender == TimelineScrollView)
+            {
+                scrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
+                scrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
+            }
+            else
+            {
+                TimelineScrollView.ScrollToVerticalOffset(e.VerticalOffset);
+                TimelineScrollView.ScrollToHorizontalOffset(e.HorizontalOffset);
+            }
         }
     }
 }
