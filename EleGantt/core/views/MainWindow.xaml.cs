@@ -1,4 +1,5 @@
-﻿using EleGantt.core.viewModels;
+﻿using EleGantt.core.models;
+using EleGantt.core.viewModels;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Diagnostics;
@@ -41,6 +42,11 @@ namespace EleGantt.core.views
             IBaseTheme baseTheme = Properties.Settings.Default.isDark ? new MaterialDesignDarkTheme() : (IBaseTheme)new MaterialDesignLightTheme();
             theme.SetBaseTheme(baseTheme);
             _paletteHelper.SetTheme(theme);
+        }
+
+        private void OpenDialog1(object sender, RoutedEventArgs e)
+        {
+            DialogHost.Show(new GanttTaskViewModel(new GanttTaskModel()), "dialog1");
         }
 
         private void AdjustTimeline()
@@ -118,11 +124,6 @@ namespace EleGantt.core.views
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyCurrentTheme();
-        }
-
-        private void SeletedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //AdjustTimeline();
         }
 
         private void ScrollChanged(object sender, ScrollChangedEventArgs e)
