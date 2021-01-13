@@ -196,8 +196,6 @@ namespace EleGantt.core.viewModels
 
         public void AddTask(GanttTaskViewModel task)
         {
-            //HERE DIALOG TODO TASK DIALOG TODO HERE MAXIME
-            TaskDialog.CreateTaskWindowModal(task);
             _TaskList.Add(task);
             OnPropertyChanged("Tasks");
         }
