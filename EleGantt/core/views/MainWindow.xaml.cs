@@ -58,6 +58,12 @@ namespace EleGantt.core.views
                 viewModel.CellWidth -= 1;
         }
 
+        public void FocusDraggingLost(object sender, RoutedEventArgs e)
+        {
+            isDraggingMilestone = false;
+            isDraggingTask = false;
+        }
+
         /// <summary>
         /// This function is used to apply the theme on the app, the parameter theme is retrieve through user's app's settings 
         /// </summary>
