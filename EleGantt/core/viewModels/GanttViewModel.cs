@@ -13,6 +13,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows.Controls;
 using EleGantt.core.views;
+using MaterialDesignThemes.Wpf;
 
 namespace EleGantt.core.viewModels
 {
@@ -285,6 +286,20 @@ namespace EleGantt.core.viewModels
                     SelectedTask = item;
                 }));
             } 
+        }
+
+        
+
+        private RelayCommand _showTaskDialog;
+        public ICommand ShowTaskDialog
+        {
+            get
+            {
+                return _showTaskDialog ?? (_showTaskDialog = new RelayCommand(task =>
+                {
+                    DialogHost.Show(task, "dialog1");
+                }));
+            }
         }
 
         private RelayCommand _removeSelectedTasksCmd;

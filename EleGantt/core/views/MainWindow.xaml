@@ -190,7 +190,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name}" Background="Red" HorizontalAlignment="Left" Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}" >
+                                <TextBlock Name="task" Text="{Binding Name}" Background="Red" HorizontalAlignment="Left" Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}" >
                                     <TextBlock.Width >
                                         <MultiBinding Converter="{StaticResource math}" ConverterParameter="x*y">
                                             <Binding Path="Length" />
@@ -204,6 +204,12 @@
                                             <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
                                         </MultiBinding>
                                     </TextBlock.Margin>
+
+                                    <TextBlock.InputBindings>
+                                        <MouseBinding MouseAction="LeftDoubleClick" 
+                                            Command="{Binding Path=DataContext.ShowTaskDialog, ElementName=Timeline}"
+                                            CommandParameter="{Binding ElementName=task,Path=DataContext}"/>
+                                    </TextBlock.InputBindings>
                                 </TextBlock>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

@@ -126,11 +126,6 @@ namespace EleGantt.core.views
             ApplyCurrentTheme();
         }
 
-        private void SeletedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //AdjustTimeline();
-        }
-
         private void ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
 
