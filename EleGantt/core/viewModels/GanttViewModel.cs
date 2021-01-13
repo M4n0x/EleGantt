@@ -10,10 +10,6 @@ using EleGantt.core.utils;
 using Newtonsoft.Json;
 using Microsoft.Win32;
 using System.IO;
-using System.Diagnostics;
-using System.Windows.Controls;
-using EleGantt.core.views;
-using MaterialDesignThemes.Wpf;
 
 namespace EleGantt.core.viewModels
 {
@@ -27,7 +23,7 @@ namespace EleGantt.core.viewModels
         private bool _saved = true; // allow to know if there is pending modifications
         private string _filePath; // save the path of the current loaded project
         private double _cellWidth = 50;
-        private double _cellHeight = 35;
+        private double _cellHeight = 40;
 
         public GanttViewModel() : this(new GanttModel("Project Name")) { }
 
@@ -60,7 +56,7 @@ namespace EleGantt.core.viewModels
 
             OnPropertyChanged(null); //update all fields
 
-            Saved = false; // no modification has pending !
+            Saved = true; // no modification has pending !
         }
 
         public string AppName
@@ -388,7 +384,6 @@ namespace EleGantt.core.viewModels
                             return; // no path has been provided so we do nothing
                         }
                     }
-
                     File.WriteAllText(_filePath, JsonConvert.SerializeObject(_project));
                     Saved = true;
                 }));
@@ -434,6 +429,7 @@ namespace EleGantt.core.viewModels
         public event EventHandler ClosingRequest;
 
         #endregion
+
 
 
     }

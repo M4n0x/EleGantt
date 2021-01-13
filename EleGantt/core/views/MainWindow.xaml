@@ -35,7 +35,7 @@
         <KeyBinding Modifiers="Control" Key="Q" Command="{Binding CloseCmd}" />
     </Window.InputBindings>
 
-    <Grid>
+    <Grid Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="30px"/>
             <RowDefinition Height="5*"/>
@@ -48,7 +48,7 @@
                 <RowDefinition Height="60px"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="220px"/>
+                <ColumnDefinition Width="2*" MinWidth="220px" MaxWidth="350px"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
 
@@ -82,7 +82,6 @@
                                 Margin="5,10"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right">
-
                                 <Button
                                     Style="{StaticResource MaterialDesignFlatButton}"
                                     IsDefault="True"
@@ -110,21 +109,11 @@
                             <StackPanel
                                 Margin="5,10"
                                 Orientation="Horizontal"
-                                HorizontalAlignment="Stretch">
-
-                                <Button x:Name="btnDelete" HorizontalAlignment="Left" Margin="10,5" Grid.Row="2" Width="50" 
-                                    Style="{StaticResource MaterialDesignOutlinedButton}" 
-                                    CommandParameter="{Binding}"
-                                    Command="{Binding Path=DataContext.RemoveMilestoneCmd, ElementName=TaskDialog}">
-                                    <materialDesign:PackIcon Kind="Delete" Width="15" Height="15"/>
-                                </Button>
-
+                                HorizontalAlignment="Right">
                                 <Button
                                     Style="{StaticResource MaterialDesignFlatButton}"
                                     IsDefault="True"
                                     Content="Accept"
-                                    HorizontalAlignment="Right"
-                                    Margin="10,5"
                                     Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
                                     <Button.CommandParameter>
                                         <sys:Boolean>True</sys:Boolean>
@@ -137,41 +126,34 @@
             </materialDesign:DialogHost>
 
             <StackPanel Grid.Row="0" Margin="10,0,10,0" Height="120px">
-                <TextBox TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Project Name'}" VerticalAlignment="Top" Padding="0 2px" Margin="0,5,0,10" FontWeight="Bold" Height="33" />
-                <Grid HorizontalAlignment="Stretch" >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="5" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom">Start</TextBlock>
-                    <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate" DisplayDateEnd="{Binding End}" Focusable="False" SelectedDate="{Binding Start}" SelectedDateChanged="SelectedDateChanged">
-                    </DatePicker>
-                    <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom">End</TextBlock>
-                    <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" DisplayDateStart="{Binding Start}" Focusable="False"  SelectedDate="{Binding End}" SelectedDateChanged="SelectedDateChanged">
-                        <DatePicker.Resources>
-                            <Style TargetType="DatePickerTextBox">
-                                <Setter Property="IsReadOnly" Value="True"/>
-                            </Style>
-                        </DatePicker.Resources>
-                    </DatePicker>
-                </Grid>
+                <TextBox TextWrapping="Wrap" Text="{Binding Name, Mode=TwoWay, FallbackValue='Project Name'}" VerticalAlignment="Top" Padding="0 2px" Margin="0,5,0,10" FontWeight="Bold" Height="33" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <WrapPanel HorizontalAlignment="Left">
+                        <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate" DisplayDateEnd="{Binding End}" Focusable="False" SelectedDate="{Binding Start}" SelectedDateChanged="SelectedDateChanged">
+                        </DatePicker>
+                    </WrapPanel>
+                    <WrapPanel Margin="5,0,0,0">
+                        <materialDesign:PackIcon Kind="TrendingFlat" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" DisplayDateStart="{Binding Start}" Focusable="False"  SelectedDate="{Binding End}" SelectedDateChanged="SelectedDateChanged">
+                            <DatePicker.Resources>
+                                <Style TargetType="DatePickerTextBox">
+                                    <Setter Property="IsReadOnly" Value="True"/>
+                                </Style>
+                            </DatePicker.Resources>
+                        </DatePicker>
+                    </WrapPanel>
+                </StackPanel>
             </StackPanel>
             <ListView x:Name="SideListView" Margin="10,0,10,0" Grid.Row="1" ItemsSource="{Binding Tasks}"  
                           dd:DragDrop.IsDragSource="True" 
                           dd:DragDrop.IsDropTarget="True" 
                           SelectedItem="{Binding SelectedTask}" 
-                          HorizontalContentAlignment="Stretch" 
-                          
+                          HorizontalContentAlignment="Stretch"
                           ScrollViewer.ScrollChanged="ScrollChanged">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
-                            <TextBox x:Name="inputTask" Text="{Binding Name}" Height="Auto" IsVisibleChanged="InputTask_IsVisibleChanged" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}}" FontWeight="Bold" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <TextBox x:Name="inputTask" Text="{Binding Name}" IsVisibleChanged="InputTask_IsVisibleChanged" Visibility="{Binding Path=IsEdition, Converter={StaticResource BooleanToVisibilityConverterKey}}" FontWeight="Bold" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="LostFocus">
                                         <i:InvokeCommandAction Command="{Binding DisableEditionCmd}" />
@@ -208,14 +190,14 @@
                 </ListView.InputBindings>
             </ListView>
 
-            <ScrollViewer Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
+            <ScrollViewer Name="MainScrollTimeline" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
 
-                <Grid VerticalAlignment="Stretch">
+                <Grid Name="GridTimeline" VerticalAlignment="Stretch" Background="{DynamicResource MaterialDesignPaper}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="120px"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    
+
                     <StackPanel>
                         <Grid Name="Timeline" HorizontalAlignment="Stretch" Grid.Row="0">
                             <Grid.RowDefinitions>
@@ -247,7 +229,7 @@
                                                    BorderThickness="0">
 
                                             <WrapPanel>
-                                                <materialDesign:PackIcon Kind="ArrowUp" Width="15" Height="15"/>
+                                                <materialDesign:PackIcon Kind="ArrowUp" Width="15" Height="15" VerticalAlignment="Center"/>
                                                 <Label Content="{Binding Name}" FontSize="10"/>
                                             </WrapPanel>
 
@@ -265,7 +247,6 @@
                                             </MultiBinding>
                                         </StackPanel.Margin>
                                     </StackPanel>
-                                    
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -333,6 +314,7 @@
                     <materialDesign:PackIcon Kind="CalendarTask" Width="15" Height="15"  />
                 </Button>
             </StackPanel>
+            <materialDesign:Snackbar Name="MainSnackbar" Grid.Row="2" Grid.Column="1" materialDesign:ThemeAssist.Theme="Inherit" HorizontalAlignment="Right" Margin="5,5" />
         </Grid>
 
         <Grid Grid.Column="0">
@@ -343,6 +325,10 @@
                         <MenuItem Header="_Open" Command="{Binding OpenProjectCmd}"/>
                         <MenuItem Header="_Save" Command="{Binding SaveProjectCmd}"/>
                         <MenuItem Header="_Save under..." CommandParameter="u" Command="{Binding SaveProjectCmd}"/>
+                        <MenuItem Header="_Export to..." >
+                            <MenuItem Header="_PNG" Click="MenuItem_Export_Click" />
+                            <MenuItem Header="_Clip board" Click="MenuItem_CB_Click" />
+                        </MenuItem>
                         <MenuItem Header="_Preferences">
                             <MenuItem Header="_Dark Theme" IsCheckable="True" IsChecked="{Binding IsDark}" Click="MenuItem_Click" />
                         </MenuItem>
@@ -353,7 +339,77 @@
                 <TextBox AcceptsReturn="True" />
             </DockPanel>
         </Grid>
+        <!-- DIALOGS-->
+        <!-- TASK -->
+        <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAway="True" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+            <materialDesign:DialogHost.DialogContentTemplate>
+                <DataTemplate DataType="local:GanttTaskViewModel">
+                    <StackPanel Margin="20,20">
+                        <TextBox Text="{Binding Name}" Margin="5,10" />
 
+                        <Grid HorizontalAlignment="Stretch"  Margin="5,10" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom">Start</TextBlock>
+                            <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate" SelectedDate="{Binding DateStart}" Focusable="False" DisplayDateEnd="{Binding DateEnd}" DisplayDateStart="{Binding Path=DataContext.Start, ElementName=TaskDialog}"/>
+                            <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom">End</TextBlock>
+                            <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" SelectedDate="{Binding DateEnd}" Focusable="False" DisplayDateStart="{Binding DateStart}" DisplayDateEnd="{Binding Path=DataContext.End, ElementName=TaskDialog}"/>
+                        </Grid>
+
+                        <TextBlock Margin="5,10" Text="{Binding Length,StringFormat='Task length : \{0\} days'}" />
+
+                        <StackPanel
+                                Margin="5,10"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                            <Button
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    IsDefault="True"
+                                    Content="Accept"
+                                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                                <Button.CommandParameter>
+                                    <sys:Boolean>True</sys:Boolean>
+                                </Button.CommandParameter>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </materialDesign:DialogHost.DialogContentTemplate>
+        </materialDesign:DialogHost>
+
+        <!-- MILESTONE -->
+        <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAway="True" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+            <materialDesign:DialogHost.DialogContentTemplate>
+                <DataTemplate DataType="local:MilestoneViewModel">
+                    <StackPanel Margin="20,20">
+                        <TextBox Text="{Binding Name}" Margin="5,10" />
+
+                        <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" SelectedDate="{Binding Date}" Focusable="False" DisplayDateStart="{Binding Path=DataContext.Start, ElementName=TaskDialog}" DisplayDateEnd="{Binding Path=DataContext.End, ElementName=TaskDialog}"/>
+
+                        <StackPanel
+                                Margin="5,10"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                            <Button
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    IsDefault="True"
+                                    Content="Accept"
+                                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                                <Button.CommandParameter>
+                                    <sys:Boolean>True</sys:Boolean>
+                                </Button.CommandParameter>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </materialDesign:DialogHost.DialogContentTemplate>
+        </materialDesign:DialogHost>
     </Grid>
-
 </Window>

@@ -11,6 +11,9 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Windows.Media.Imaging;
+using System.IO;
+using Microsoft.Win32;
 
 namespace EleGantt.core.views
 {
@@ -35,6 +38,9 @@ namespace EleGantt.core.views
             ApplyCurrentTheme();
 
             AdjustTimeline();
+
+            var mainMessageQueue = new SnackbarMessageQueue(TimeSpan.FromMilliseconds(5000));
+            MainSnackbar.MessageQueue = mainMessageQueue;
         }
 
         /// <summary>
@@ -199,6 +205,7 @@ namespace EleGantt.core.views
             //create "month" textbox
             TextBlock monthBox = new TextBlock { Text = month };
             monthBox.HorizontalAlignment = HorizontalAlignment.Center;
+            monthBox.VerticalAlignment = VerticalAlignment.Bottom;
             if (duration!= 0)
                 Grid.SetColumnSpan(monthBox, duration);
             Grid.SetColumn(monthBox, start);
@@ -297,6 +304,75 @@ namespace EleGantt.core.views
         private void SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             AdjustTimeline();
+        }
+
+
+
+        private void MenuItem_Export_Click(object sender, RoutedEventArgs e)
+        {
+            string filename = "ScreenCapture-" + DateTime.Now.ToString("ddMMyyyy-hhmmss") + ".png";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "EleGantt Capture (*.png)|*.png",
+                DefaultExt = "elegantt",
+                AddExtension = true,
+                FileName = filename
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string filepath = saveFileDialog.FileName;
+                SaveToPng(filepath);
+                MainSnackbar.MessageQueue.Enqueue($"Export to {filepath} successfull ! ");
+            }
+
+        }
+
+        private void MenuItem_CB_Click(object sender, RoutedEventArgs e)
+        {
+            SaveToCB();
+            MainSnackbar.MessageQueue.Enqueue("Export to clipboard successfull ! ");
+        }
+
+        void SaveToPng(string fileName)
+        {
+            var encoder = new PngBitmapEncoder();
+            var frame = PrepareTimelineScreen();
+
+            encoder.Frames.Add(frame);
+
+            using (var stream = File.Create(fileName))
+            {
+                encoder.Save(stream);
+            }
+        }
+
+        void SaveToCB()
+        {
+            var frame = PrepareTimelineScreen();
+            Clipboard.SetImage(frame);
+        }
+
+        private BitmapFrame PrepareTimelineScreen()
+        {
+            MainScrollTimeline.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+            MainScrollTimeline.ScrollToHome();
+            
+            MainScrollTimeline.UpdateLayout();
+            var frame = SaveUsingEncoder(GridTimeline);
+            MainScrollTimeline.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            MainScrollTimeline.UpdateLayout();
+
+            return frame;
+        }
+
+        BitmapFrame SaveUsingEncoder(FrameworkElement visual)
+        {
+            RenderTargetBitmap bitmap = new RenderTargetBitmap((int)visual.ActualWidth, (int)visual.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(visual);
+            BitmapFrame frame = BitmapFrame.Create(bitmap);
+
+            return frame;
         }
     }
 }
