@@ -300,6 +300,22 @@ namespace EleGantt.core.viewModels
             }
         }
 
+        private RelayCommand _removeMilestoneCmd;
+        /// <summary>
+        /// This command allow to remove current selected task from the list
+        /// </summary>
+        public ICommand RemoveMilestoneCmd
+        {
+            get
+            {
+                return _removeMilestoneCmd ?? (_removeMilestoneCmd = new RelayCommand(milestone =>
+                {
+                    RemoveMilestone(milestone as MilestoneViewModel);
+                    DialogHost.CloseDialogCommand.Execute(null, null);
+                }));
+            }
+        }
+
         private RelayCommand _removeSelectedTasksCmd;
         /// <summary>
         /// This command allow to remove current selected task from the list
@@ -403,6 +419,7 @@ namespace EleGantt.core.viewModels
                 }));
             }
         }
+
 
 
         private RelayCommand _closeCmd;

@@ -11,7 +11,8 @@ namespace EleGantt.core.utils.converters
     //see https://stackoverflow.com/questions/37949599/how-to-dynamically-draw-a-timeline-in-wpf
     public class EventLengthConverter : IMultiValueConverter
     {
-
+        private DateTime lastStartProject;
+        private double lastCellWidth;
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             /*
@@ -27,6 +28,10 @@ namespace EleGantt.core.utils.converters
             double factor = (startTaskTime - startProjectTime).Days;
             double rval = factor * containerWidth;
 
+            //stock values for two-way
+            lastStartProject = startProjectTime;
+            lastCellWidth = containerWidth;
+
             if (targetType == typeof(Thickness))
             {
                 return new Thickness(rval, 0, 0, 0);
@@ -39,7 +44,18 @@ namespace EleGantt.core.utils.converters
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
         {
-            throw new NotImplementedException();
+            Thickness? th = value as Thickness?;
+            if (th.HasValue)
+            {
+                foreach(var i in targetTypes)
+                    Console.WriteLine($"expected :  {i}");
+
+                double marginLeft = th.Value.Left;
+                double delta = marginLeft / lastCellWidth;
+                Console.WriteLine($"delta : {delta}, new day : {lastStartProject.AddDays(delta)}");
+                return new object[] { DateTime.Now.AddDays(1), DateTime.Now.AddDays(10), 10};
+            }
+            return new object[] { };
         }
     }
 }
