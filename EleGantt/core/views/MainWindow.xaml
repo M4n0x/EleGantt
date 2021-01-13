@@ -53,7 +53,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- DIALOGS-->
-            <materialDesign:DialogHost CloseOnClickAwayParameter="True" CloseOnClickAway="True" Identifier="dialog1" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+            <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAwayParameter="True" CloseOnClickAway="True" Identifier="dialog1" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
                 <materialDesign:DialogHost.DialogContentTemplate>
                     <DataTemplate DataType="local:GanttTaskViewModel">
                         <StackPanel Margin="20,20">
@@ -70,9 +70,9 @@
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom">Start</TextBlock>
-                                <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate"  SelectedDate="{Binding DateStart}" Focusable="False" DisplayDateEnd="{Binding DateEnd}"/>
+                                <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate" SelectedDate="{Binding DateStart}" Focusable="False" DisplayDateEnd="{Binding DateEnd}" DisplayDateStart="{Binding Path=DataContext.Start, ElementName=TaskDialog}"/>
                                 <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom">End</TextBlock>
-                                <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" SelectedDate="{Binding DateEnd}" Focusable="False" DisplayDateStart="{Binding DateStart}"/>
+                                <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" SelectedDate="{Binding DateEnd}" Focusable="False" DisplayDateStart="{Binding DateStart}" DisplayDateEnd="{Binding Path=DataContext.End, ElementName=TaskDialog}"/>
                             </Grid>
 
                             <TextBlock Margin="5,10" Text="{Binding Length,StringFormat='Task length : \{0\} days'}" />
@@ -204,7 +204,7 @@
 
                                     <TextBlock.InputBindings>
                                         <MouseBinding MouseAction="LeftDoubleClick" 
-                                            Command="{Binding Path=DataContext.ShowTaskDialog, ElementName=Timeline}"
+                                            Command="{Binding ShowTaskDialog}"
                                             CommandParameter="{Binding ElementName=task,Path=DataContext}"/>
                                     </TextBlock.InputBindings>
                                 </TextBlock>

@@ -198,6 +198,7 @@ namespace EleGantt.core.viewModels
         {
             _TaskList.Add(task);
             OnPropertyChanged("Tasks");
+            task.ShowEditForm();
         }
 
         public void RemoveTask(GanttTaskViewModel task)
@@ -284,20 +285,6 @@ namespace EleGantt.core.viewModels
                     SelectedTask = item;
                 }));
             } 
-        }
-
-        
-
-        private RelayCommand _showTaskDialog;
-        public ICommand ShowTaskDialog
-        {
-            get
-            {
-                return _showTaskDialog ?? (_showTaskDialog = new RelayCommand(task =>
-                {
-                    DialogHost.Show(task, "dialog1");
-                }));
-            }
         }
 
         private RelayCommand _removeSelectedTasksCmd;

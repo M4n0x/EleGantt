@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Input;
 using EleGantt.core.models;
+using MaterialDesignThemes.Wpf;
 
 namespace EleGantt.core.viewModels
 {
@@ -81,6 +82,11 @@ namespace EleGantt.core.viewModels
             get { return _task.DateEnd; }
         }
 
+        public void ShowEditForm()
+        {
+            DialogHost.Show(this, "dialog1");
+        }
+
         #region INotifyPropertyChanged Members  
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -93,6 +99,8 @@ namespace EleGantt.core.viewModels
         }
 
         #endregion
+
+
 
         #region COMMANDS 
         
@@ -108,6 +116,18 @@ namespace EleGantt.core.viewModels
                 {
                     if (!IsEdition) // avoid firing unncessary OnPropertyChange if it's already in edit mode
                         IsEdition = true;
+                }));
+            }
+        }
+
+        private RelayCommand _showTaskDialog;
+        public ICommand ShowTaskDialog
+        {
+            get
+            {
+                return _showTaskDialog ?? (_showTaskDialog = new RelayCommand(x =>
+                {
+                    ShowEditForm();
                 }));
             }
         }
