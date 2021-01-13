@@ -59,13 +59,17 @@ namespace EleGantt.core.views
 
         private void AdjustTimeline()
         {
-            if (!StartDate.SelectedDate.HasValue || !EndDate.SelectedDate.HasValue)
+            if (StartDate == null || !StartDate.SelectedDate.HasValue || EndDate == null || !EndDate.SelectedDate.HasValue || Timeline == null)
                 return;
 
             int currentMonthDays = 0, index = 0;
 
-            DateTime currentDay = StartDate.SelectedDate.Value;
+            DateTime start = StartDate.SelectedDate.Value;
+            DateTime currentDay = start;
             DateTime end = EndDate.SelectedDate.Value;
+
+            Timeline.ColumnDefinitions.Clear();
+            Timeline.Children.Clear();
 
             string currentMonth = currentDay.ToString("MMMM");
 
@@ -74,7 +78,8 @@ namespace EleGantt.core.views
                 Timeline.ColumnDefinitions.Add(new ColumnDefinition()
                 {
                     Width = new GridLength(50),
-                }) ;
+                });
+
                 //create "day" textbox
                 TextBlock box = new TextBlock() { Text = currentDay.Day.ToString() };
                 box.HorizontalAlignment = HorizontalAlignment.Left;
@@ -94,7 +99,7 @@ namespace EleGantt.core.views
                 }
                 currentDay = currentDay.AddDays(1);
             }
-            //add last month
+            
             AddMonth(currentMonth, index - currentMonthDays, currentMonthDays);
         }
 
@@ -103,7 +108,8 @@ namespace EleGantt.core.views
             //create "month" textbox
             TextBlock monthBox = new TextBlock { Text = month };
             monthBox.HorizontalAlignment = HorizontalAlignment.Center;
-            Grid.SetColumnSpan(monthBox, duration);
+            if (duration!= 0)
+                Grid.SetColumnSpan(monthBox, duration);
             Grid.SetColumn(monthBox, start);
             Grid.SetRow(monthBox, 0);
             Timeline.Children.Add(monthBox);
@@ -137,23 +143,69 @@ namespace EleGantt.core.views
         private void ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
 
-            return;
-            // Get the border of the listview (first child of a listview)
-            Decorator border = VisualTreeHelper.GetChild(SideListView, 0) as Decorator;
-
             // Get scrollviewer
-            ScrollViewer scrollViewer = border.Child as ScrollViewer;
+            ScrollViewer scrollViewer = GetDescendantByType(SideListView, typeof(ScrollViewer)) as ScrollViewer;
+
 
             if (sender == TimelineScrollView)
             {
-                scrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
-                scrollViewer.ScrollToHorizontalOffset(e.HorizontalOffset);
+                if (e.VerticalChange != 0)
+                {
+                    if (TimelineScrollView.ScrollableHeight != 0)
+                    {
+                        double ratio = e.VerticalOffset / TimelineScrollView.ScrollableHeight;
+                        scrollViewer.ScrollToVerticalOffset(scrollViewer.ScrollableHeight * ratio);
+                    }
+                }
+                /*if (e.HorizontalOffset != 0)
+                {
+                    double ratio = e.HorizontalOffset / TimelineScrollView.ScrollableWidth;
+                    DatelineScrollView.ScrollToHorizontalOffset(DatelineScrollView.ScrollableWidth * ratio);
+                }*/
             }
             else
             {
-                TimelineScrollView.ScrollToVerticalOffset(e.VerticalOffset);
-                TimelineScrollView.ScrollToHorizontalOffset(e.HorizontalOffset);
+                if (e.VerticalChange != 0)
+                {
+                    if (scrollViewer.ScrollableHeight != 0)
+                    {
+                        double ratio = e.VerticalOffset / scrollViewer.ScrollableHeight;
+                        Trace.WriteLine("ratio 2 : " + ratio);
+                        TimelineScrollView.ScrollToVerticalOffset(TimelineScrollView.ScrollableHeight * ratio);
+                    }
+                }
             }
+        }
+        public static Visual GetDescendantByType(Visual element, Type type)
+        {
+            if (element == null)
+            {
+                return null;
+            }
+            if (element.GetType() == type)
+            {
+                return element;
+            }
+            Visual foundElement = null;
+            if (element is FrameworkElement)
+            {
+                (element as FrameworkElement).ApplyTemplate();
+            }
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(element); i++)
+            {
+                Visual visual = VisualTreeHelper.GetChild(element, i) as Visual;
+                foundElement = GetDescendantByType(visual, type);
+                if (foundElement != null)
+                {
+                    break;
+                }
+            }
+            return foundElement;
+        }
+
+        private void SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AdjustTimeline();
         }
     }
 }

@@ -27,7 +27,7 @@ namespace EleGantt.core.viewModels
         private bool _saved = true; // allow to know if there is pending modifications
         private string _filePath; // save the path of the current loaded project
         private double _cellWidth = 50;
-        private double _cellHeight = 30;
+        private double _cellHeight = 35;
 
         public GanttViewModel() : this(new GanttModel("Project Name")) { }
 

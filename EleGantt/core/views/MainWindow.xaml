@@ -138,10 +138,10 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom">Start</TextBlock>
-                    <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate" DisplayDateEnd="{Binding End}" Focusable="False" SelectedDate="{Binding Start}">
+                    <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate" DisplayDateEnd="{Binding End}" Focusable="False" SelectedDate="{Binding Start}" SelectedDateChanged="SelectedDateChanged">
                     </DatePicker>
                     <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom">End</TextBlock>
-                    <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" DisplayDateStart="{Binding Start}" Focusable="False"  SelectedDate="{Binding End}">
+                    <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" DisplayDateStart="{Binding Start}" Focusable="False"  SelectedDate="{Binding End}" SelectedDateChanged="SelectedDateChanged">
                         <DatePicker.Resources>
                             <Style TargetType="DatePickerTextBox">
                                 <Setter Property="IsReadOnly" Value="True"/>
@@ -150,12 +150,12 @@
                     </DatePicker>
                 </Grid>
             </StackPanel>
-            <ListView x:Name="SideListView" Margin="10,0,10,0" Grid.Row="1" ItemsSource="{Binding Tasks}"  
+            <ListView x:Name="SideListView" Margin="10,10,10,0" Grid.Row="1" ItemsSource="{Binding Tasks}"  
                           dd:DragDrop.IsDragSource="True" 
                           dd:DragDrop.IsDropTarget="True" 
                           SelectedItem="{Binding SelectedTask}" 
                           HorizontalContentAlignment="Stretch" 
-                          VerticalContentAlignment="Stretch"
+                          
                           ScrollViewer.ScrollChanged="ScrollChanged">
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -191,101 +191,71 @@
                     <KeyBinding Key="Delete" 
                                     CommandParameter="{Binding ElementName=SideListView, Path=SelectedItems}"
                                     Command="{Binding RemoveSelectedTasksCmd}" />
-                    <KeyBinding Key="F2" 
+                    <KeyBinding Key="F2"
                                     CommandParameter="{Binding ElementName=SideListView, Path=SelectedItems}"
                                     Command="{Binding EditSelectedTasksCmd}" />
                 </ListView.InputBindings>
             </ListView>
 
-            <ScrollViewer Name="TimelineScrollView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Auto" ScrollChanged="ScrollChanged">
-                <StackPanel>
-                    <Grid Name="Timeline" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+            <ScrollViewer Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
+             
+                <Grid VerticalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="80px"/>
+                        <RowDefinition Height="250*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Name="Timeline" HorizontalAlignment="Stretch" Grid.Row="0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="40px" />
-                            <RowDefinition Height="40px" />
-                            <RowDefinition Height="40px" />
+                            <RowDefinition Height="40px"/>
+                            <RowDefinition Height="40px"/>
                         </Grid.RowDefinitions>
-
-                        <ItemsControl ItemsSource="{Binding Milestones}" Grid.Row="2">
+                    </Grid>
+                    <ScrollViewer Name="TimelineScrollView" Margin="0,27,0,0" VerticalScrollBarVisibility="Visible" ScrollChanged="ScrollChanged" Grid.Row="1">
+                        <ItemsControl ItemsSource="{Binding Tasks}" >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Canvas>
+                                    <StackPanel>
 
-                                    </Canvas>
+                                    </StackPanel>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border BorderThickness="1" BorderBrush="Black" CornerRadius="10">
-                                        <Border.Margin>
+                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Stretch"  Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline,  Converter={StaticResource math}, ConverterParameter=x}">
+                                        <materialDesign:Card Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline, Converter={StaticResource math}, ConverterParameter=x-3}"
+                                               
+                                                   Background="{DynamicResource PrimaryHueDarkBrush}"
+                                                   HorizontalAlignment="Left"
+                                                   Margin="0,1">
+
+                                            <Label Content="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"/>
+                                            <materialDesign:Card.Width>
+                                                <MultiBinding Converter="{StaticResource math}" ConverterParameter="(x+1)*y">
+                                                    <Binding Path="Length" />
+                                                    <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
+                                                </MultiBinding>
+                                            </materialDesign:Card.Width>
+                                            <materialDesign:Card.InputBindings>
+                                                <MouseBinding MouseAction="LeftDoubleClick" 
+                                            Command="{Binding ShowTaskDialog}"/>
+                                            </materialDesign:Card.InputBindings>
+                                        </materialDesign:Card>
+
+                                        <StackPanel.Margin>
                                             <MultiBinding Converter="{StaticResource mEventLengthConverter}">
                                                 <Binding ElementName="Timeline" Path="DataContext.Start"/>
-                                                <Binding Path="Date"/>
+                                                <Binding Path="DateStart"/>
                                                 <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
                                             </MultiBinding>
-                                        </Border.Margin>
-
-                                        <Border.InputBindings>
-                                            <MouseBinding MouseAction="LeftDoubleClick" 
-                                                Command="{Binding ShowMilestoneDialog}"
-                                                CommandParameter="{Binding DataContext}"/>
-                                        </Border.InputBindings>
-
-                                        <Border.Style>
-                                            <Style>
-                                                <Setter Property="Border.Background" Value="Gray"/>
-                                                <Style.Triggers>
-                                                    <Trigger Property="Border.IsMouseOver" Value="True">
-                                                        <Setter Property="Border.Background" Value="LightGray" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-
-                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="2,0"/>
-                                    </Border>
+                                        </StackPanel.Margin>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </Grid>
-
-
-                    <ItemsControl ItemsSource="{Binding Tasks}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel>
-
-                                </StackPanel>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" Background="Green" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center" Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}" >
-                                    <TextBlock.Width >
-                                        <MultiBinding Converter="{StaticResource math}" ConverterParameter="x*y">
-                                            <Binding Path="Length" />
-                                            <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
-                                        </MultiBinding>
-                                    </TextBlock.Width>
-                                    <TextBlock.Margin>
-                                        <MultiBinding Converter="{StaticResource mEventLengthConverter}">
-                                            <Binding ElementName="Timeline" Path="DataContext.Start"/>
-                                            <Binding Path="DateStart"/>
-                                            <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
-                                        </MultiBinding>
-                                    </TextBlock.Margin>
-
-                                    <TextBlock.InputBindings>
-                                        <MouseBinding MouseAction="LeftDoubleClick" 
-                                            Command="{Binding ShowTaskDialog}"
-                                            CommandParameter="{Binding DataContext}"/>
-                                    </TextBlock.InputBindings>
-                                </TextBlock>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                    </ScrollViewer>
+                </Grid>
             </ScrollViewer>
+
 
             <Button x:Name="btnDelete" HorizontalAlignment="Left" Margin="10,10,0,15" Grid.Row="2" Width="75" 
                     Style="{StaticResource MaterialDesignOutlinedButton}" 
