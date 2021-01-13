@@ -1,4 +1,5 @@
 ﻿using EleGantt.core.viewModels;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace EleGantt.core.views
             taskViewModel = ganttTaskViewModel;
             DataContext = taskViewModel;
             InitializeComponent();
+            AjustTheme();
         }
 
         public void BtnOk_Click(object sender, RoutedEventArgs e)
@@ -34,13 +36,22 @@ namespace EleGantt.core.views
             Close();
         }
 
+        private void AjustTheme()
+        {
+            var palette = new PaletteHelper();
+            ITheme theme = palette.GetTheme();
+            IBaseTheme baseTheme = Properties.Settings.Default.isDark ? new MaterialDesignDarkTheme() : (IBaseTheme)new MaterialDesignLightTheme();
+            theme.SetBaseTheme(baseTheme);
+            palette.SetTheme(theme);
+        }
+
         public static void CreateTaskWindowModal(GanttTaskViewModel ganttTaskViewModel)
         {
             var dialog = new TaskDialog(ganttTaskViewModel);
             dialog.ShowDialog();
-            //add next code snippet if the modal is supposed to give result back
+            //add next code snippet if the modal is supposed to give a result back
             /*if (dialog.DialogResult == true)
-                Console.WriteLine("over");//*/
+                return dialog.getResult*/
         }
     }
 }
