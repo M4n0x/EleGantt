@@ -25,6 +25,7 @@ namespace EleGantt.core.views
         private GanttViewModel viewModel;
         private readonly PaletteHelper _paletteHelper = new PaletteHelper();
         private CultureInfo culture = CultureInfo.CurrentCulture;
+        
 
         public MainWindow()
         {
@@ -41,6 +42,20 @@ namespace EleGantt.core.views
 
             var mainMessageQueue = new SnackbarMessageQueue(TimeSpan.FromMilliseconds(5000));
             MainSnackbar.MessageQueue = mainMessageQueue;
+
+            PreviewMouseWheel += Window_PreviewMouseWheel;
+        }
+
+        private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (Keyboard.Modifiers != ModifierKeys.Control)
+                return;
+
+            if (e.Delta > 0)
+                viewModel.CellWidth += 1;
+
+            else if (e.Delta < 0)
+                viewModel.CellWidth -= 1;
         }
 
         /// <summary>
@@ -87,8 +102,13 @@ namespace EleGantt.core.views
 
             if(Math.Abs(taskDragBuffer) >= 1)
             {
-                draggingTask.DateEnd = draggingTask.DateEnd.AddDays(1 * Math.Sign(taskDragBuffer));
-                draggingTask.DateStart = draggingTask.DateStart.AddDays(1 * Math.Sign(taskDragBuffer));
+                var nextEndTime = draggingTask.DateEnd.AddDays(1 * Math.Sign(taskDragBuffer));
+                var nextStartTime = draggingTask.DateStart.AddDays(1 * Math.Sign(taskDragBuffer));
+                if (IsDateInProject(nextEndTime) && IsDateInProject(nextStartTime))
+                {
+                    draggingTask.DateEnd = nextEndTime;
+                    draggingTask.DateStart = nextStartTime;
+                }
                 taskDragBuffer -= 1 * Math.Sign(taskDragBuffer);
             }
 
@@ -133,11 +153,18 @@ namespace EleGantt.core.views
 
             if (Math.Abs(milestoneDragBuffer) >= 1)
             {
-                draggingMilestone.Date = draggingMilestone.Date.AddDays(1 * Math.Sign(milestoneDragBuffer));
+                var nextDate = draggingMilestone.Date.AddDays(1 * Math.Sign(milestoneDragBuffer));
+                if(IsDateInProject(nextDate))
+                    draggingMilestone.Date = nextDate;
                 milestoneDragBuffer -= 1 * Math.Sign(milestoneDragBuffer);
             }
 
             milestoneDragLastX = currentX;
+        }
+
+        private bool IsDateInProject(DateTime time)
+        {
+            return (time >= viewModel.Start && time <= viewModel.End);
         }
 
         private void Milestone_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -170,11 +197,9 @@ namespace EleGantt.core.views
             string currentMonth = currentDay.ToString("MMMM");
 
             while (currentDay <= end) {
-
-                Timeline.ColumnDefinitions.Add(new ColumnDefinition()
-                {
-                    Width = new GridLength(50),
-                });
+                var cd = new ColumnDefinition();
+                cd.SetBinding(ColumnDefinition.WidthProperty, new Binding("CellWidth"));
+                Timeline.ColumnDefinitions.Add(cd);
 
                 //create "day" textbox
                 //TextBlock box = new TextBlock() { Text = $"{currentDay.Day.ToString()} { culture.DateTimeFormat.GetAbbreviatedDayName(currentDay.DayOfWeek)}" };

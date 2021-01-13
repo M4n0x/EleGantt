@@ -52,79 +52,6 @@
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- DIALOGS-->
-            <!-- TASK -->
-            <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAway="True" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
-                <materialDesign:DialogHost.DialogContentTemplate>
-                    <DataTemplate DataType="local:GanttTaskViewModel">
-                        <StackPanel Margin="20,20">
-                            <TextBox Text="{Binding Name}" Margin="5,10" />
-
-                            <Grid HorizontalAlignment="Stretch"  Margin="5,10" >
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition Width="10" />
-                                    <ColumnDefinition Width="auto" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="auto"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom">Start</TextBlock>
-                                <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate" SelectedDate="{Binding DateStart}" Focusable="False" DisplayDateEnd="{Binding DateEnd}" DisplayDateStart="{Binding Path=DataContext.Start, ElementName=TaskDialog}"/>
-                                <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom">End</TextBlock>
-                                <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" SelectedDate="{Binding DateEnd}" Focusable="False" DisplayDateStart="{Binding DateStart}" DisplayDateEnd="{Binding Path=DataContext.End, ElementName=TaskDialog}"/>
-                            </Grid>
-
-                            <TextBlock Margin="5,10" Text="{Binding Length,StringFormat='Task length : \{0\} days'}" />
-
-                            <StackPanel
-                                Margin="5,10"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Right">
-                                <Button
-                                    Style="{StaticResource MaterialDesignFlatButton}"
-                                    IsDefault="True"
-                                    Content="Accept"
-                                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
-                                    <Button.CommandParameter>
-                                        <sys:Boolean>True</sys:Boolean>
-                                    </Button.CommandParameter>
-                                </Button>
-                            </StackPanel>
-                        </StackPanel>
-                    </DataTemplate>
-                </materialDesign:DialogHost.DialogContentTemplate>
-            </materialDesign:DialogHost>
-            
-            <!-- MILESTONE -->
-            <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAway="True" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
-                <materialDesign:DialogHost.DialogContentTemplate>
-                    <DataTemplate DataType="local:MilestoneViewModel">
-                        <StackPanel Margin="20,20">
-                            <TextBox Text="{Binding Name}" Margin="5,10" />
-
-                            <DatePicker Grid.Column="2" Grid.Row="1" Name="EndDate" SelectedDate="{Binding Date}" Focusable="False" DisplayDateStart="{Binding Path=DataContext.Start, ElementName=TaskDialog}" DisplayDateEnd="{Binding Path=DataContext.End, ElementName=TaskDialog}"/>
-
-                            <StackPanel
-                                Margin="5,10"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Right">
-                                <Button
-                                    Style="{StaticResource MaterialDesignFlatButton}"
-                                    IsDefault="True"
-                                    Content="Accept"
-                                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
-                                    <Button.CommandParameter>
-                                        <sys:Boolean>True</sys:Boolean>
-                                    </Button.CommandParameter>
-                                </Button>
-                            </StackPanel>
-                        </StackPanel>
-                    </DataTemplate>
-                </materialDesign:DialogHost.DialogContentTemplate>
-            </materialDesign:DialogHost>
-
             <StackPanel Grid.Row="0" Margin="10,0,10,0" Height="120px">
                 <TextBox TextWrapping="Wrap" Text="{Binding Name, Mode=TwoWay, FallbackValue='Project Name'}" VerticalAlignment="Top" Padding="0 2px" Margin="0,5,0,10" FontWeight="Bold" Height="33" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -191,7 +118,10 @@
             </ListView>
 
             <ScrollViewer Name="MainScrollTimeline" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
-
+                <ScrollViewer.InputBindings>
+                    <MouseBinding MouseAction="MiddleClick"
+                      Command="{Binding ResetCell}"/>
+                </ScrollViewer.InputBindings>
                 <Grid Name="GridTimeline" VerticalAlignment="Stretch" Background="{DynamicResource MaterialDesignPaper}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="120px"/>
@@ -339,9 +269,10 @@
                 <TextBox AcceptsReturn="True" />
             </DockPanel>
         </Grid>
+
         <!-- DIALOGS-->
         <!-- TASK -->
-        <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAway="True" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+        <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAway="False" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
             <materialDesign:DialogHost.DialogContentTemplate>
                 <DataTemplate DataType="local:GanttTaskViewModel">
                     <StackPanel Margin="20,20">
@@ -369,6 +300,7 @@
                                 Margin="5,10"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right">
+
                             <Button
                                     Style="{StaticResource MaterialDesignFlatButton}"
                                     IsDefault="True"
@@ -385,7 +317,7 @@
         </materialDesign:DialogHost>
 
         <!-- MILESTONE -->
-        <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAway="True" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+        <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAway="False" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
             <materialDesign:DialogHost.DialogContentTemplate>
                 <DataTemplate DataType="local:MilestoneViewModel">
                     <StackPanel Margin="20,20">
@@ -396,11 +328,21 @@
                         <StackPanel
                                 Margin="5,10"
                                 Orientation="Horizontal"
-                                HorizontalAlignment="Right">
+                                HorizontalAlignment="Stretch">
+
+                            <Button x:Name="btnDelete" HorizontalAlignment="Left" Margin="10,5" Grid.Row="2" Width="50" 
+                                    Style="{StaticResource MaterialDesignOutlinedButton}" 
+                                    CommandParameter="{Binding}"
+                                    Command="{Binding Path=DataContext.RemoveMilestoneCmd, ElementName=TaskDialog}">
+                                <materialDesign:PackIcon Kind="Delete" Width="15" Height="15"/>
+                            </Button>
+
                             <Button
                                     Style="{StaticResource MaterialDesignFlatButton}"
                                     IsDefault="True"
                                     Content="Accept"
+                                    HorizontalAlignment="Right"
+                                    Margin="10,5"
                                     Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
                                 <Button.CommandParameter>
                                     <sys:Boolean>True</sys:Boolean>

@@ -10,6 +10,7 @@ using EleGantt.core.utils;
 using Newtonsoft.Json;
 using Microsoft.Win32;
 using System.IO;
+using MaterialDesignThemes.Wpf;
 
 namespace EleGantt.core.viewModels
 {
@@ -24,6 +25,9 @@ namespace EleGantt.core.viewModels
         private string _filePath; // save the path of the current loaded project
         private double _cellWidth = 50;
         private double _cellHeight = 40;
+        public const int CELL_WIDTH_MIN = 10;
+        public const int CELL_WIDTH_MAX = 100;
+        public const int CELL_WIDTH_BASE = 50;
 
         public GanttViewModel() : this(new GanttModel("Project Name")) { }
 
@@ -69,8 +73,11 @@ namespace EleGantt.core.viewModels
             get { return _cellWidth;  }
             set 
             {
-                _cellWidth = value;
-                OnPropertyChanged("CellWidth");
+                if (value >= CELL_WIDTH_MIN && value <= CELL_WIDTH_MAX)
+                {
+                    _cellWidth = value;
+                    OnPropertyChanged("CellWidth");
+                }
             }
         }
 
@@ -276,7 +283,7 @@ namespace EleGantt.core.viewModels
             {
                 return _addTaskCmd ?? (_addTaskCmd = new RelayCommand(x => 
                 {
-                    var item = new GanttTaskViewModel(new GanttTaskModel { Name = "New Task", DateStart = DateTime.Now, DateEnd = DateTime.Now.AddDays(2) });
+                    var item = new GanttTaskViewModel(new GanttTaskModel { Name = "New Task", DateStart = Start, DateEnd = Start.AddDays(2) });
                     AddTask(item);
                     SelectedTask = item;
                 }));
@@ -363,6 +370,21 @@ namespace EleGantt.core.viewModels
                 return _createNewProjectCmd ?? (_createNewProjectCmd = new RelayCommand(x =>
                 {
                     LoadGanttModel(new GanttModel("New project"));
+                }));
+            }
+        }
+
+        private RelayCommand _resetCell;
+        /// <summary>
+        /// This command allow to create a new project
+        /// </summary>
+        public ICommand ResetCell
+        {
+            get
+            {
+                return _resetCell ?? (_resetCell = new RelayCommand(x =>
+                {
+                    CellWidth = CELL_WIDTH_BASE;
                 }));
             }
         }
