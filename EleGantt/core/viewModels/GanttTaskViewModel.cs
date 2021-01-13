@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Input;
 using EleGantt.core.models;
+using MaterialDesignThemes.Wpf;
 
 namespace EleGantt.core.viewModels
 {
@@ -9,7 +10,7 @@ namespace EleGantt.core.viewModels
     /// <summary>
     /// This viewModel is used to hold task'clas
     /// </summary>
-    internal class GanttTaskViewModel : INotifyPropertyChanged
+    public class GanttTaskViewModel : INotifyPropertyChanged
     {
         private GanttTaskModel _task;
         private bool _isSelected;
@@ -17,12 +18,18 @@ namespace EleGantt.core.viewModels
 
         public GanttTaskViewModel(GanttTaskModel task)
         {
-            this._task = task;
+            _task = task;
         }
 
         public GanttTaskModel GanttTaskModel
         {
             get { return _task; }
+        }
+
+
+        public int Length
+        {
+            get { return (_task.DateEnd - _task.DateStart).Days; }
         }
 
         public bool IsSelected
@@ -60,8 +67,9 @@ namespace EleGantt.core.viewModels
             {
                 _task.DateStart = value;
                 OnPropertyChanged("DateStart");
+                OnPropertyChanged("Length");
             }
-            get { return _task.DateEnd; }
+            get { return _task.DateStart; }
         }
         public DateTime DateEnd
         {
@@ -69,8 +77,14 @@ namespace EleGantt.core.viewModels
             {
                 _task.DateEnd = value;
                 OnPropertyChanged("DateEnd");
+                OnPropertyChanged("Length");
             }
             get { return _task.DateEnd; }
+        }
+
+        public void ShowEditForm()
+        {
+            DialogHost.Show(this, "dialogTask");
         }
 
         #region INotifyPropertyChanged Members  
@@ -85,6 +99,8 @@ namespace EleGantt.core.viewModels
         }
 
         #endregion
+
+
 
         #region COMMANDS 
         
@@ -103,6 +119,19 @@ namespace EleGantt.core.viewModels
                 }));
             }
         }
+
+        private RelayCommand _showTaskDialog;
+        public ICommand ShowTaskDialog
+        {
+            get
+            {
+                return _showTaskDialog ?? (_showTaskDialog = new RelayCommand(x =>
+                {
+                    ShowEditForm();
+                }));
+            }
+        }
+
 
         /// <summary>
         /// This command is used to disable edition of the task 

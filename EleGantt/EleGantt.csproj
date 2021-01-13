@@ -46,6 +46,9 @@
     <Reference Include="MaterialDesignThemes.Wpf, Version=3.2.0.1979, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.3.2.0\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="MathConverter, Version=1.2.1.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathConverter.1.2.1.6\lib\net40-client\MathConverter.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
@@ -88,6 +91,7 @@
     <Compile Include="core\models\MilestoneModel.cs" />
     <Compile Include="core\utils\BoundObservableCollection.cs" />
     <Compile Include="core\utils\converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="core\utils\converters\EventLengthConverter.cs" />
     <Compile Include="core\viewModels\RelayCommand.cs" />
     <Compile Include="core\viewModels\GanttTaskViewModel.cs" />
     <Compile Include="core\viewModels\GanttViewModel.cs" />

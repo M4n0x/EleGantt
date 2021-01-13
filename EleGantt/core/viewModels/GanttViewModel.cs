@@ -11,6 +11,9 @@ using Newtonsoft.Json;
 using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
+using System.Windows.Controls;
+using EleGantt.core.views;
+using MaterialDesignThemes.Wpf;
 
 namespace EleGantt.core.viewModels
 {
@@ -20,8 +23,11 @@ namespace EleGantt.core.viewModels
         private ObservableCollection<MilestoneViewModel> _MilestoneList;
         private GanttModel _project;
         private GanttTaskViewModel _selectedTask;
+        private int _duration;
         private bool _saved = true; // allow to know if there is pending modifications
         private string _filePath; // save the path of the current loaded project
+        private double _cellWidth = 50;
+        private double _cellHeight = 35;
 
         public GanttViewModel() : this(new GanttModel("Project Name")) { }
 
@@ -50,6 +56,8 @@ namespace EleGantt.core.viewModels
             _TaskList.CollectionChanged += (sender, e) => { Saved = false; }; 
             _MilestoneList.CollectionChanged += (sender, e) => { Saved = false; };
 
+            UpdateDuration();
+
             OnPropertyChanged(null); //update all fields
 
             Saved = false; // no modification has pending !
@@ -58,6 +66,26 @@ namespace EleGantt.core.viewModels
         public string AppName
         {
             get { return "EleGantt - " + (_saved ? _project.Name : _project.Name + " *"); }
+        }
+
+        public double CellWidth
+        {
+            get { return _cellWidth;  }
+            set 
+            {
+                _cellWidth = value;
+                OnPropertyChanged("CellWidth");
+            }
+        }
+
+        public double CellHeight
+        {
+            get { return _cellHeight; }
+            set
+            {
+                _cellHeight = value;
+                OnPropertyChanged("CellHeight");
+            }
         }
 
         public bool IsDark
@@ -119,15 +147,58 @@ namespace EleGantt.core.viewModels
             }
         }
 
+        public DateTime Start
+        {
+            get { return _project.Start; }
+            set
+            {
+                _project.Start = value;
+                OnPropertyChanged("Start");
+                UpdateDuration();
+            }
+        }
+
+        public DateTime End
+        {
+            get { return _project.End; }
+            set
+            {
+                _project.End = value;
+                OnPropertyChanged("End");
+                UpdateDuration();
+            }
+        }
+
+        public int Duration
+        {
+            get { return _duration; }
+            set
+            {
+                _duration = value;
+                OnPropertyChanged("Duration");
+            }
+        }
+
+        private void UpdateDuration()
+        {
+            int updated = (_project.End - _project.Start).Days;
+            if(updated != _duration)
+            {
+                Duration = updated;
+            }
+        }
+
+
         public void AddTask(GanttTaskModel task)
         {
-            AddTask(new GanttTaskViewModel(task));
+            AddTask(task);
         }
 
         public void AddTask(GanttTaskViewModel task)
         {
             _TaskList.Add(task);
             OnPropertyChanged("Tasks");
+            task.ShowEditForm();
         }
 
         public void RemoveTask(GanttTaskViewModel task)
@@ -147,6 +218,7 @@ namespace EleGantt.core.viewModels
         {
             _MilestoneList.Add(milestone);
             OnPropertyChanged("Milestones");
+            milestone.ShowEditForm();
         }
 
         public void RemoveMilestone(MilestoneViewModel milestone)
@@ -208,12 +280,24 @@ namespace EleGantt.core.viewModels
             {
                 return _addTaskCmd ?? (_addTaskCmd = new RelayCommand(x => 
                 {
-                    //TODO Adjust datestart date related to the project, same for the end date 
                     var item = new GanttTaskViewModel(new GanttTaskModel { Name = "New Task", DateStart = DateTime.Now, DateEnd = DateTime.Now.AddDays(2) });
                     AddTask(item);
                     SelectedTask = item;
                 }));
             } 
+        }
+
+        private RelayCommand _addMilestoneCmd;
+        public ICommand AddMilestoneCmd
+        {
+            get
+            {
+                return _addMilestoneCmd ?? (_addMilestoneCmd = new RelayCommand(x =>
+                {
+                    var milestone = new MilestoneViewModel(new MilestoneModel { Name="Milestone", Date=Start });
+                    AddMilestone(milestone);
+                }));
+            }
         }
 
         private RelayCommand _removeSelectedTasksCmd;
@@ -333,6 +417,8 @@ namespace EleGantt.core.viewModels
         public event EventHandler ClosingRequest;
 
         #endregion
+
+
     }
 
 }
