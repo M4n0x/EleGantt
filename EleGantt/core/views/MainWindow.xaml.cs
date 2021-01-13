@@ -6,6 +6,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Windows.Media.Imaging;
@@ -22,6 +25,8 @@ namespace EleGantt.core.views
         private GanttViewModel viewModel;
         private readonly PaletteHelper _paletteHelper = new PaletteHelper();
         private CultureInfo culture = CultureInfo.CurrentCulture;
+        
+
         public MainWindow()
         {
             viewModel = new GanttViewModel();
@@ -37,6 +42,20 @@ namespace EleGantt.core.views
 
             var mainMessageQueue = new SnackbarMessageQueue(TimeSpan.FromMilliseconds(5000));
             MainSnackbar.MessageQueue = mainMessageQueue;
+
+            PreviewMouseWheel += Window_PreviewMouseWheel;
+        }
+
+        private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (Keyboard.Modifiers != ModifierKeys.Control)
+                return;
+
+            if (e.Delta > 0)
+                viewModel.CellWidth += 1;
+
+            else if (e.Delta < 0)
+                viewModel.CellWidth -= 1;
         }
 
         /// <summary>
@@ -55,7 +74,113 @@ namespace EleGantt.core.views
             DialogHost.Show(new GanttTaskViewModel(new GanttTaskModel()), "dialog1");
         }
 
-        private void AdjustTimeline()
+        #region task dragg
+        GanttTaskViewModel draggingTask;
+        public bool isDraggingTask = false;
+        double taskDragLastX;
+        double taskDragBuffer;
+        private void Task_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isDraggingTask = true;
+
+            draggingTask = (sender as StackPanel).DataContext as GanttTaskViewModel;
+            taskDragLastX = e.GetPosition(this).X;
+            taskDragBuffer = 0;
+        }
+
+        private void Task_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!isDraggingTask)
+                return;
+
+            var currentX = e.GetPosition(this).X;
+            var delta = currentX - taskDragLastX;
+
+            double dayDelta = delta / viewModel.CellWidth;
+            taskDragBuffer += dayDelta;
+
+
+            if(Math.Abs(taskDragBuffer) >= 1)
+            {
+                var nextEndTime = draggingTask.DateEnd.AddDays(1 * Math.Sign(taskDragBuffer));
+                var nextStartTime = draggingTask.DateStart.AddDays(1 * Math.Sign(taskDragBuffer));
+                if (IsDateInProject(nextEndTime) && IsDateInProject(nextStartTime))
+                {
+                    draggingTask.DateEnd = nextEndTime;
+                    draggingTask.DateStart = nextStartTime;
+                }
+                taskDragBuffer -= 1 * Math.Sign(taskDragBuffer);
+            }
+
+            taskDragLastX = currentX;
+        }
+
+        private void Task_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!isDraggingTask)
+                return;
+
+            isDraggingTask = false;
+        }
+        #endregion
+
+        #region milestone dragg
+        MilestoneViewModel draggingMilestone;
+        public bool isDraggingMilestone = false;
+        double milestoneDragLastX;
+        double milestoneDragBuffer;
+
+        private void Milestone_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isDraggingMilestone = true;
+
+            draggingMilestone = (sender as StackPanel).DataContext as MilestoneViewModel;
+            milestoneDragLastX = e.GetPosition(this).X;
+            milestoneDragBuffer = 0;
+        }
+
+        private void Milestone_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!isDraggingMilestone)
+                return;
+
+            var currentX = e.GetPosition(this).X;
+            var delta = currentX - milestoneDragLastX;
+
+            double dayDelta = delta / viewModel.CellWidth;
+            milestoneDragBuffer += dayDelta;
+
+
+            if (Math.Abs(milestoneDragBuffer) >= 1)
+            {
+                var nextDate = draggingMilestone.Date.AddDays(1 * Math.Sign(milestoneDragBuffer));
+                if(IsDateInProject(nextDate))
+                    draggingMilestone.Date = nextDate;
+                milestoneDragBuffer -= 1 * Math.Sign(milestoneDragBuffer);
+            }
+
+            milestoneDragLastX = currentX;
+        }
+
+        private bool IsDateInProject(DateTime time)
+        {
+            return (time >= viewModel.Start && time <= viewModel.End);
+        }
+
+        private void Milestone_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!isDraggingMilestone)
+                return;
+
+            isDraggingMilestone = false;
+        }
+
+    
+    #endregion
+
+
+
+    private void AdjustTimeline()
         {
             if (StartDate == null || !StartDate.SelectedDate.HasValue || EndDate == null || !EndDate.SelectedDate.HasValue || Timeline == null)
                 return;
@@ -72,11 +197,9 @@ namespace EleGantt.core.views
             string currentMonth = currentDay.ToString("MMMM");
 
             while (currentDay <= end) {
-
-                Timeline.ColumnDefinitions.Add(new ColumnDefinition()
-                {
-                    Width = new GridLength(50),
-                });
+                var cd = new ColumnDefinition();
+                cd.SetBinding(ColumnDefinition.WidthProperty, new Binding("CellWidth"));
+                Timeline.ColumnDefinitions.Add(cd);
 
                 //create "day" textbox
                 //TextBlock box = new TextBlock() { Text = $"{currentDay.Day.ToString()} { culture.DateTimeFormat.GetAbbreviatedDayName(currentDay.DayOfWeek)}" };

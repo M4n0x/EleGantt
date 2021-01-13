@@ -118,7 +118,10 @@
             </ListView>
 
             <ScrollViewer Name="MainScrollTimeline" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
-
+                <ScrollViewer.InputBindings>
+                    <MouseBinding MouseAction="MiddleClick"
+                      Command="{Binding ResetCell}"/>
+                </ScrollViewer.InputBindings>
                 <Grid Name="GridTimeline" VerticalAlignment="Stretch" Background="{DynamicResource MaterialDesignPaper}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="120px"/>
@@ -141,7 +144,12 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Stretch" Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}">
+                                    <StackPanel HorizontalAlignment="Left" 
+                                                VerticalAlignment="Stretch" 
+                                                Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}"
+                                                PreviewMouseLeftButtonDown ="Milestone_PreviewMouseLeftButtonDown"
+                                                PreviewMouseMove="Milestone_PreviewMouseMove"
+                                                PreviewMouseLeftButtonUp="Milestone_PreviewMouseLeftButtonUp">
                                         <Button    HorizontalAlignment="Center"
                                                    Padding="0"
                                                    Margin="0"
@@ -178,17 +186,28 @@
                         <ItemsControl ItemsSource="{Binding Tasks}" >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel>
-
-                                    </StackPanel>
+                                    <StackPanel />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel  HorizontalAlignment="Left" VerticalAlignment="Stretch" Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}">
+                                    <StackPanel Name="task" HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                                Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}"
+                                                PreviewMouseLeftButtonDown ="Task_PreviewMouseLeftButtonDown"
+                                                PreviewMouseMove="Task_PreviewMouseMove"
+                                                PreviewMouseLeftButtonUp="Task_PreviewMouseLeftButtonUp">
+
+                                        <StackPanel.Margin>
+                                            <MultiBinding Converter="{StaticResource mEventLengthConverter}">
+                                                <Binding ElementName="Timeline" Path="DataContext.Start"/>
+                                                <Binding Path="DateStart"/>
+                                                <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
+                                            </MultiBinding>
+                                        </StackPanel.Margin>
+
                                         <Button Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline, Converter={StaticResource math}, ConverterParameter=x-2}"
-                                                   HorizontalAlignment="Left"
-                                                   Margin="0,1" >
+                                                HorizontalAlignment="Left"
+                                                Margin="0,1">
 
                                             <Label Content="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"/>
                                             <Button.Width>
@@ -202,14 +221,6 @@
                                                 Command="{Binding ShowTaskDialog}"/>
                                             </Button.InputBindings>
                                         </Button>
-
-                                        <StackPanel.Margin>
-                                            <MultiBinding Converter="{StaticResource mEventLengthConverter}">
-                                                <Binding ElementName="Timeline" Path="DataContext.Start"/>
-                                                <Binding Path="DateStart"/>
-                                                <Binding ElementName="Timeline" Path="DataContext.CellWidth"/>
-                                            </MultiBinding>
-                                        </StackPanel.Margin>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -258,9 +269,10 @@
                 <TextBox AcceptsReturn="True" />
             </DockPanel>
         </Grid>
+
         <!-- DIALOGS-->
         <!-- TASK -->
-        <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAway="True" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+        <materialDesign:DialogHost Name="TaskDialog" CloseOnClickAway="False" Identifier="dialogTask" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
             <materialDesign:DialogHost.DialogContentTemplate>
                 <DataTemplate DataType="local:GanttTaskViewModel">
                     <StackPanel Margin="20,20">
@@ -288,6 +300,7 @@
                                 Margin="5,10"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right">
+
                             <Button
                                     Style="{StaticResource MaterialDesignFlatButton}"
                                     IsDefault="True"
@@ -304,7 +317,7 @@
         </materialDesign:DialogHost>
 
         <!-- MILESTONE -->
-        <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAway="True" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
+        <materialDesign:DialogHost Name="MilestoneDialog" CloseOnClickAway="False" Identifier="dialogMilestone" DialogTheme="Inherit" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="3">
             <materialDesign:DialogHost.DialogContentTemplate>
                 <DataTemplate DataType="local:MilestoneViewModel">
                     <StackPanel Margin="20,20">
@@ -315,11 +328,21 @@
                         <StackPanel
                                 Margin="5,10"
                                 Orientation="Horizontal"
-                                HorizontalAlignment="Right">
+                                HorizontalAlignment="Stretch">
+
+                            <Button x:Name="btnDelete" HorizontalAlignment="Left" Margin="10,5" Grid.Row="2" Width="50" 
+                                    Style="{StaticResource MaterialDesignOutlinedButton}" 
+                                    CommandParameter="{Binding}"
+                                    Command="{Binding Path=DataContext.RemoveMilestoneCmd, ElementName=TaskDialog}">
+                                <materialDesign:PackIcon Kind="Delete" Width="15" Height="15"/>
+                            </Button>
+
                             <Button
                                     Style="{StaticResource MaterialDesignFlatButton}"
                                     IsDefault="True"
                                     Content="Accept"
+                                    HorizontalAlignment="Right"
+                                    Margin="10,5"
                                     Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
                                 <Button.CommandParameter>
                                     <sys:Boolean>True</sys:Boolean>
