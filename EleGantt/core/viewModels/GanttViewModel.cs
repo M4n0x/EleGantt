@@ -29,7 +29,7 @@ namespace EleGantt.core.viewModels
         public const int CELL_WIDTH_MAX = 100;
         public const int CELL_WIDTH_BASE = 50;
 
-        public GanttViewModel() : this(new GanttModel("Project Name")) { }
+        public GanttViewModel() : this(new GanttModel("")) { }
 
         public GanttViewModel(GanttModel gantt)
         {

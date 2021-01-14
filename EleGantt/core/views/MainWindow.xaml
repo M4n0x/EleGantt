@@ -53,7 +53,8 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Row="0" Margin="10,0,10,0" Height="120px">
-                <TextBox TextWrapping="Wrap" Text="{Binding Name, Mode=TwoWay, FallbackValue='Project Name'}" VerticalAlignment="Top" Padding="0 2px" Margin="0,5,0,10" FontWeight="Bold" Height="33" />
+                <TextBox TextWrapping="Wrap" Text="{Binding Name, Mode=TwoWay}" materialDesign:HintAssist.Hint="Project Name"
+            Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}" VerticalAlignment="Top" Padding="0 2px" Margin="0,5,0,10" FontWeight="Bold" Height="43" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <WrapPanel HorizontalAlignment="Left">
                         <DatePicker Grid.Column="2" Grid.Row="0" Name="StartDate" DisplayDateEnd="{Binding End}" Focusable="False" SelectedDate="{Binding Start}" SelectedDateChanged="SelectedDateChanged">
