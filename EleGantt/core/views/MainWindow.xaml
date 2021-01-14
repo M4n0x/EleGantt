@@ -149,8 +149,7 @@
                                                 Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}"
                                                 PreviewMouseLeftButtonDown ="Milestone_PreviewMouseLeftButtonDown"
                                                 PreviewMouseMove="Milestone_PreviewMouseMove"
-                                                PreviewMouseLeftButtonUp="Milestone_PreviewMouseLeftButtonUp"
-                                                LostFocus="FocusDraggingLost">
+                                                PreviewMouseLeftButtonUp="Milestone_PreviewMouseLeftButtonUp">
                                         <Button    HorizontalAlignment="Center"
                                                    Padding="0"
                                                    Margin="0"
@@ -196,8 +195,7 @@
                                                 Height="{Binding Path=DataContext.CellHeight, ElementName=Timeline}"
                                                 PreviewMouseLeftButtonDown ="Task_PreviewMouseLeftButtonDown"
                                                 PreviewMouseMove="Task_PreviewMouseMove"
-                                                PreviewMouseLeftButtonUp="Task_PreviewMouseLeftButtonUp"
-                                                LostFocus="FocusDraggingLost">
+                                                PreviewMouseLeftButtonUp="Task_PreviewMouseLeftButtonUp">
 
                                         <StackPanel.Margin>
                                             <MultiBinding Converter="{StaticResource mEventLengthConverter}">
