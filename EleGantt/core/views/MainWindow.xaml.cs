@@ -179,7 +179,9 @@ namespace EleGantt.core.views
     #endregion
 
 
-
+    /// <summary>
+    /// This function is used to display days and months in the timeline
+    /// </summary>
     private void AdjustTimeline()
         {
             if (StartDate == null || !StartDate.SelectedDate.HasValue || EndDate == null || !EndDate.SelectedDate.HasValue || Timeline == null)
@@ -202,7 +204,6 @@ namespace EleGantt.core.views
                 Timeline.ColumnDefinitions.Add(cd);
 
                 //create "day" textbox
-                //TextBlock box = new TextBlock() { Text = $"{currentDay.Day.ToString()} { culture.DateTimeFormat.GetAbbreviatedDayName(currentDay.DayOfWeek)}" };
                 TextBlock box = new TextBlock() { Text = currentDay.Day.ToString() };
                 box.HorizontalAlignment = HorizontalAlignment.Left;
                 box.VerticalAlignment = VerticalAlignment.Center;
@@ -225,6 +226,12 @@ namespace EleGantt.core.views
             AddMonth(currentMonth, index - currentMonthDays, currentMonthDays);
         }
 
+        /// <summary>
+        /// Add a label to the timeline display
+        /// </summary>
+        /// <param name="month"></param>
+        /// <param name="start"></param>
+        /// <param name="duration"></param>
         private void AddMonth(String month, int start, int duration)
         {
             //create "month" textbox
@@ -263,6 +270,11 @@ namespace EleGantt.core.views
             ApplyCurrentTheme();
         }
 
+        /// <summary>
+        /// Synchornize scroll between two scrollviewer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
 
@@ -280,11 +292,6 @@ namespace EleGantt.core.views
                         scrollViewer.ScrollToVerticalOffset(scrollViewer.ScrollableHeight * ratio);
                     }
                 }
-                /*if (e.HorizontalOffset != 0)
-                {
-                    double ratio = e.HorizontalOffset / TimelineScrollView.ScrollableWidth;
-                    DatelineScrollView.ScrollToHorizontalOffset(DatelineScrollView.ScrollableWidth * ratio);
-                }*/
             }
             else
             {
@@ -331,8 +338,6 @@ namespace EleGantt.core.views
             AdjustTimeline();
         }
 
-
-
         private void MenuItem_Export_Click(object sender, RoutedEventArgs e)
         {
             string filename = "ScreenCapture-" + DateTime.Now.ToString("ddMMyyyy-hhmmss") + ".png";
@@ -378,6 +383,10 @@ namespace EleGantt.core.views
             Clipboard.SetImage(frame);
         }
 
+        /// <summary>
+        /// This function change the timeline's display to prepare for taking a full capture of the main grid element
+        /// </summary>
+        /// <returns>Bitmap of the grid</returns>
         private BitmapFrame PrepareTimelineScreen()
         {
             MainScrollTimeline.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
@@ -391,6 +400,11 @@ namespace EleGantt.core.views
             return frame;
         }
 
+        /// <summary>
+        /// This function take a capute of an element
+        /// </summary>
+        /// <param name="visual"></param>
+        /// <returns></returns>
         BitmapFrame SaveUsingEncoder(FrameworkElement visual)
         {
             RenderTargetBitmap bitmap = new RenderTargetBitmap((int)visual.ActualWidth, (int)visual.ActualHeight, 96, 96, PixelFormats.Pbgra32);
