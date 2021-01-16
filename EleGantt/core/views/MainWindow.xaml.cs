@@ -78,20 +78,17 @@ namespace EleGantt.core.views
             _paletteHelper.SetTheme(theme);
         }
 
-        private void OpenDialog1(object sender, RoutedEventArgs e)
-        {
-            DialogHost.Show(new GanttTaskViewModel(new GanttTaskModel()), "dialog1");
-        }
-
         #region task dragg
+        //dragging attributes
         GanttTaskViewModel draggingTask;
         public bool isDraggingTask = false;
         double taskDragLastX;
         double taskDragBuffer;
         private void Task_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            //set dragging to true
             isDraggingTask = true;
-
+            //init dragging variables
             draggingTask = (sender as StackPanel).DataContext as GanttTaskViewModel;
             taskDragLastX = e.GetPosition(this).X;
             taskDragBuffer = 0;
@@ -99,16 +96,18 @@ namespace EleGantt.core.views
 
         private void Task_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+            //verify dragging
             if (!isDraggingTask)
                 return;
 
+            //calculate position delta between last mouve and current move
             var currentX = e.GetPosition(this).X;
             var delta = currentX - taskDragLastX;
+            double dayDelta = delta / viewModel.CellWidth; //transform position value to day value
+            taskDragBuffer += dayDelta; //add to buffer
 
-            double dayDelta = delta / viewModel.CellWidth;
-            taskDragBuffer += dayDelta;
-
-
+            //if buffer is more than 1 day : apply the delta to start/end
+            //This allows a "cranted", discrete movement day-by-day and the task is never in the middle of 2 days
             if(Math.Abs(taskDragBuffer) >= 1)
             {
                 var nextEndTime = draggingTask.DateEnd.AddDays(1 * Math.Sign(taskDragBuffer));
@@ -118,9 +117,10 @@ namespace EleGantt.core.views
                     draggingTask.DateEnd = nextEndTime;
                     draggingTask.DateStart = nextStartTime;
                 }
-                taskDragBuffer -= 1 * Math.Sign(taskDragBuffer);
+                taskDragBuffer -= 1 * Math.Sign(taskDragBuffer); //sub delta from bufer
             }
 
+            //save current x
             taskDragLastX = currentX;
         }
 
@@ -134,6 +134,8 @@ namespace EleGantt.core.views
         #endregion
 
         #region milestone dragg
+        //SIMILAR TO TASK DRAGG but with 1 date instead of 2
+        //Please refer to the taskdrag region to see the commented version
         MilestoneViewModel draggingMilestone;
         public bool isDraggingMilestone = false;
         double milestoneDragLastX;
@@ -189,7 +191,8 @@ namespace EleGantt.core.views
 
 
     /// <summary>
-    /// This function is used to display days and months in the timeline
+    /// This function is used to display days and months in the timeline. This is not possible in binding because there need to be
+    /// an iteration between the start date and end date of the project, as well as a calcul for the month's case length
     /// </summary>
     private void AdjustTimeline()
         {

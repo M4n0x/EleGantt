@@ -20,6 +20,9 @@ namespace EleGantt.core.viewModels
             get { return _milestone; }
         }
 
+        /// <summary>
+        /// Show the dialog in the view used to edit the milestone
+        /// </summary>
         public void ShowEditForm()
         {
             DialogHost.Show(this, "dialogMilestone");
@@ -37,7 +40,11 @@ namespace EleGantt.core.viewModels
                 return _milestone.Name;
             }
         }
+
         private RelayCommand _showMilestoneDialog;
+        /// <summary>
+        /// Command used to show the edit dialog for a particular milestone
+        /// </summary>
         public ICommand ShowMilestoneDialog
         {
             get

@@ -23,8 +23,10 @@ namespace EleGantt.core.viewModels
         private int _duration;
         private bool _saved = true; // allow to know if there is pending modifications
         private string _filePath; // save the path of the current loaded project
+        //width & height linked to property
         private double _cellWidth = 50;
         private double _cellHeight = 40;
+        //const used to born the width (changing with zoom) : min, max, base
         public const int CELL_WIDTH_MIN = 10;
         public const int CELL_WIDTH_MAX = 100;
         public const int CELL_WIDTH_BASE = 50;
@@ -73,8 +75,11 @@ namespace EleGantt.core.viewModels
             get { return _cellWidth;  }
             set 
             {
+                //verify that the value is whitin bounds
                 if (value >= CELL_WIDTH_MIN && value <= CELL_WIDTH_MAX)
                 {
+                    //zoom is NOT saved in the ganttmodel, thus not saved in memory. If the persistance of the zoom is required,
+                    //this is a good place to do it (_project.cellwidth = ...). A fresh start is estimated better for now
                     _cellWidth = value;
                     OnPropertyChanged("CellWidth");
                 }
@@ -184,6 +189,7 @@ namespace EleGantt.core.viewModels
 
         private void UpdateDuration()
         {
+            //avoir chanding the duration property if the duration is the same
             int updated = (_project.End - _project.Start).Days;
             if(updated != _duration)
             {

@@ -26,7 +26,10 @@ namespace EleGantt.core.viewModels
             get { return _task; }
         }
 
-
+        /// <summary>
+        /// Length is a read-only property, intrinsecaly calculated from the start and end value.
+        /// It can not have a setter as the start/end date should be changed, but there is no indication as to which one is to be changed
+        /// </summary>
         public int Length
         {
             get { return (_task.DateEnd - _task.DateStart).Days; }
