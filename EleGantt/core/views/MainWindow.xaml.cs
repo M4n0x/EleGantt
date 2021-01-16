@@ -23,37 +23,46 @@ namespace EleGantt.core.views
     public partial class MainWindow : Window
     {
         private GanttViewModel viewModel;
-        private readonly PaletteHelper _paletteHelper = new PaletteHelper();
-        private CultureInfo culture = CultureInfo.CurrentCulture;
-        
+        private readonly PaletteHelper _paletteHelper = new PaletteHelper(); //dark/white theme
+        private CultureInfo culture = CultureInfo.CurrentCulture; //used to put the days as 3 letters, currently not in use
 
         public MainWindow()
         {
+            //init viewmodel
             viewModel = new GanttViewModel();
-
             viewModel.ClosingRequest += delegate { Close(); };
-
             DataContext = viewModel;
             InitializeComponent();
 
+            //init theme and timeline
             ApplyCurrentTheme();
-
             AdjustTimeline();
 
+            //message system
             var mainMessageQueue = new SnackbarMessageQueue(TimeSpan.FromMilliseconds(5000));
             MainSnackbar.MessageQueue = mainMessageQueue;
 
+            //listen to mouse wheel for zoom
             PreviewMouseWheel += Window_PreviewMouseWheel;
+
+            Focus(); //used to bind the command to the "about" menuitem
         }
 
+        /// <summary>
+        /// Listen to the wheel rotation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (Keyboard.Modifiers != ModifierKeys.Control)
                 return;
 
+            //zoom++
             if (e.Delta > 0)
                 viewModel.CellWidth += 1;
 
+            //zoom--
             else if (e.Delta < 0)
                 viewModel.CellWidth -= 1;
         }
