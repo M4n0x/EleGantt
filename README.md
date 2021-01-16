@@ -55,6 +55,18 @@ _Edition d'un milestone_
 
 Ces popups permettent de modifier rapidement les dates de début et de fin. Lorsqu'on souhaite déplacer une tâche et non modifier sa durée il est possible de simplement "drag & droper" la tâche. De cette manière on peut faire glisser la tâche à n'importe quel endroit de la timeline, la même chose est possible pour les milestones.
 
+### Installer
+Elegantt est un projet qui réuni de nombreuses librairies sous forme de DLL (Ex : MaterialDesign.dll).\
+Ainsi, l'executable généré par un simple build en mode "release" est associé à des DLLs qui sont simplement placés dans le dossier release par visual studio. Cependant, exeuter cet executable sur une autre machine requiert :
+* Que la machine dispose des DLLs accessibles, ce qui est très incertain
+* Que l'executable soit accompagné de toutes les DLLs, ce qui est très inconfortable sur les utilisateurs
+
+Plusieurs solutions existent, comme des utilitaires qui permettent de "bundler" les DLLs dans l'executable final, afin d'obtenir un unique executable. Cependant, cela gâche un peut le principe des DLLs.\
+Visual studio propose un type de projet très particulier, le "setup project". Il s'agit d'un [projet sans code qui permet de configurer le déploiement d'un installer](https://docs.microsoft.com/en-us/cpp/windows/walkthrough-deploying-a-visual-cpp-application-by-using-a-setup-project?view=msvc-160).\
+C'est cette solution qui a été retenue. En effet, l'installer offre une plateforme de gestion d'install/uninstall/réparation du logiciel au lieu d'un simple executable balloté par le temps. Il permet de ranger "elegantt" au bon endroit (Programm Files) sans effort, et l'installer d'Elegantt est configuré pour créer automatiquement un raccourcis sur le bureau.\
+\
+Pour partager elegantt, il suffit de récupérer le dossier "elegantt-installer" à la racine du projet. Il contient l'installer (.msi) ainsi que le setup.exe qui le lance. Il suffit de lancer ce setup pour apprécier le programme en toute stabilité.
+
 ### Menu 
 
 Depuis le menu plusieurs actions sont possibles :
@@ -68,6 +80,7 @@ Depuis le menu plusieurs actions sont possibles :
   * PNG
   * dans le presse-papiers
 * Changement du thème, deux thème sont disponibles, un "dark" theme ainsi qu'un "light" theme.
+* Page "about" qui donne le nom des développeurs & le logo He-Arc
 
 ![image](https://user-images.githubusercontent.com/6802086/104789843-5fdd9480-5796-11eb-9419-899869b5108f.png)
 _Light theme_
