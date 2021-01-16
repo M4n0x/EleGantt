@@ -19,7 +19,7 @@ Les dates de début et de fin sont importantes car elles vont limiter la créati
 
 Dans la suite du bandeau, se trouve la gestion des tâches ainsi que les différentes actions disponibles dans EleGantt
 
-![image](https://user-images.githubusercontent.com/6802086/104787427-c4e1bc00-578f-11eb-9e3b-7cea25f5250f.png)
+![image](https://user-images.githubusercontent.com/6802086/104790604-f8284900-5797-11eb-8452-90d2edde17cf.png)
 
 Les 3 boutons sont respectivement : la suppression d'une tâche, l'ajout d'un milestone ainsi que l'ajout d'une tâche.
 
